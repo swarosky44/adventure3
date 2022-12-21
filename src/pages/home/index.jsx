@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import reactLogo from '@/assets/react.svg'
+import './style.less'
 
-function App() {
+const Home = () => {
   const [count, setCount] = useState(0)
-  console.info('come in')
 
   return (
     <div className="App">
@@ -28,4 +27,4 @@ function App() {
   )
 }
 
-export default App
+export default Home
