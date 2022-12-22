@@ -1,12 +1,26 @@
 import { useState } from 'react'
+import { useAccount, useEnsName } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import reactLogo from '@/assets/react.svg'
 import './style.less'
 
 const Home = () => {
   const [count, setCount] = useState(0)
+  const { address, isConnected } = useAccount()
+  const { data: ensName } = useEnsName({ address })
 
   return (
     <div className="App">
+      <div>
+        <h1>wagmi + RainbowKit + Vite</h1>
+        <ConnectButton />
+        {isConnected && (
+          <div>
+            {ensName ?? address}
+            {ensName ? ` (${address})` : null}
+          </div>
+        )}
+      </div>
       <div>
         <a href="https://vitejs.dev" target="_blank">
           <img src="/vite.svg" className="logo" alt="Vite logo" />
