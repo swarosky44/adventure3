@@ -9,10 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.8.0",
     "@babel/eslint-parser": "^7.19.1",
     "@babel/preset-react": "^7.18.6",
     "@loadable/component": "^5.15.2",
     "@rainbow-me/rainbowkit": "^0.8.1",
+    "antd": "^5.1.2",
+    "braft-editor": "^2.3.9",
     "buffer": "^6.0.3",
     "classnames": "^2.3.2",
     "ethers": "^5.7.2",

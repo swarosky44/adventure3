@@ -3,7 +3,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import BasicLayout from '@/layouts/basic'
 
 const Home = loadable(() => import('@/pages/home'))
-const Test = loadable(() => import('@/pages/test'))
+const Advertiser = loadable(() => import('@/pages/advertiserForm'))
 
 const routesConfig = createBrowserRouter([
   {
@@ -11,8 +11,8 @@ const routesConfig = createBrowserRouter([
     element: <BasicLayout />,
     children: [
       {
-        path: 'test',
-        element: <Test />
+        path: 'advertiser',
+        element: <Advertiser />
       },
       {
         index: true,
