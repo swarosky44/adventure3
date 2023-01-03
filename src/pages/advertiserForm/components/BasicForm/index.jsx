@@ -7,14 +7,7 @@ const BasicForm = () => {
 
   return (
     <div className="comp">
-      <Form
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 14 }}
-        name="basic-form"
-        form={form}
-        className="form"
-        layout="vertical"
-      >
+      <Form name="basic-form" form={form} className="form" layout="vertical">
         <Form.Item name="commutityName" label="项目名称" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
@@ -68,7 +61,7 @@ const BasicForm = () => {
         <Form.Item name="methodId" label="methodID">
           <Input />
         </Form.Item>
-        <Form.Item wrapperCol={{ span: 16, offset: 8 }}>
+        <Form.Item>
           <Button type="primary">保存</Button>
         </Form.Item>
       </Form>

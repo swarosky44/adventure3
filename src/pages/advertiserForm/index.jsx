@@ -23,7 +23,7 @@ const items = [
   }
 ]
 const AdvertiserForm = () => {
-  const [current] = useState(1)
+  const [current] = useState(2)
 
   return (
     <Card>
