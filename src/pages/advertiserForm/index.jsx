@@ -5,25 +5,26 @@ import TaskForm from './components/TaskForm'
 import FormResult from './components/FormResult'
 import './style.less'
 
-const items = [
-  {
-    title: '项目基础信息',
-    key: 'commutity',
-    content: <BasicForm />
-  },
-  {
-    title: '任务配置',
-    key: 'task',
-    content: <TaskForm />
-  },
-  {
-    title: '配置完成',
-    key: 'result',
-    content: <FormResult />
-  }
-]
 const AdvertiserForm = () => {
-  const [current] = useState(2)
+  const [current, setCurrent] = useState(1)
+
+  const items = [
+    {
+      title: '项目基础信息',
+      key: 'commutity',
+      content: <BasicForm setCurrent={setCurrent} />
+    },
+    {
+      title: '任务配置',
+      key: 'task',
+      content: <TaskForm setCurrent={setCurrent} />
+    },
+    {
+      title: '配置完成',
+      key: 'result',
+      content: <FormResult setCurrent={setCurrent} />
+    }
+  ]
 
   return (
     <Card>
