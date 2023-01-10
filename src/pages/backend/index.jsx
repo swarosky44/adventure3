@@ -7,6 +7,7 @@ import './style.less'
 
 const AdvertiserForm = () => {
   const [current, setCurrent] = useState(1)
+  const [taskResult, setTaskResult] = useState(null)
 
   const items = [
     {
@@ -17,12 +18,12 @@ const AdvertiserForm = () => {
     {
       title: '任务配置',
       key: 'task',
-      content: <TaskForm setCurrent={setCurrent} />
+      content: <TaskForm setCurrent={setCurrent} setTaskResult={setTaskResult} />
     },
     {
       title: '配置完成',
       key: 'result',
-      content: <FormResult setCurrent={setCurrent} />
+      content: <FormResult data={taskResult} />
     }
   ]
 

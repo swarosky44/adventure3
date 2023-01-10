@@ -14,39 +14,23 @@ import {
   ConfigProvider,
   Space
 } from 'antd'
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons'
-// import { useAccount } from 'wagmi'
+import { InboxOutlined, PlusOutlined } from '@ant-design/icons'
+import { useAccount } from 'wagmi'
 import zhCN from 'antd/locale/zh_CN'
-// import { request } from '@/utils/request'
+import { request } from '@/utils/request'
 import QuillEditor from '../quillEditor'
-import MultiSelectItem from '../multiSelectItem'
-import MultiInputItem from '../MultiInputItem'
 import TaskItemDrawer from '../TaskItemDrawer'
 import { TASK_TYPE } from '@/utils/const'
 import './style.less'
 
-const TaskForm = ({ setCurrent = () => {} }) => {
-  const [previewLogo, setPreviewLogo] = useState('')
+const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const [drawerVisible, setDrawerVisible] = useState(false)
-  const [taskList, setTaskList] = useState([
-    {
-      index: 0,
-      actionObject: 'https://1688.com',
-      iconUrl: '240c9d4859ea47b7b7ee11785fb20e94.jpeg',
-      taskType: 'FOLLOW_TWITTER'
-    },
-    {
-      index: 1,
-      actionObject: 'https://1688111.com',
-      iconUrl: '240c9d4859ea47b7b7ee11785fb20e94.jpeg',
-      taskType: 'FOLLOW_TWITTER'
-    }
-  ])
+  const [taskList, setTaskList] = useState([])
   const [recordItem, setRecordItem] = useState(null)
   const [form] = Form.useForm()
   const isActionTask = Form.useWatch('isActionTask', form)
   const isCpaTask = Form.useWatch('isCpaTask', form)
-  // const { account } = useAccount()
+  const { address } = useAccount()
 
   const checkTitle = async (_, value) => {
     const fvalue = value.trim()
@@ -88,40 +72,37 @@ const TaskForm = ({ setCurrent = () => {} }) => {
   }
 
   const onSubmit = async (values) => {
-    console.info(values)
-    // const params = {
-    //   accountAddress: account,
-    //   title: 'test title',
-    //   desc: 'desc',
-    //   activityImg: 'activityImg',
-    //   launchStartTime: 'launchStartTime',
-    //   launchEndTime: 'launchEndTime',
-    //   isActionTask: true,
-    //   actionTaskRewardUnit: 'actionTaskRewardUnit',
-    //   actionTaskRewardChainNetwork: 'polygon',
-    //   actionTaskRewardNum: 1,
-    //   actionTaskRewardBudget: 1,
-    //   actionTaskDrawTime: 'actionTaskDrawTime',
-    //   actionTaskDTOS: [
-    //     {
-    //       iconUrl: 'iconUrl',
-    //       taskType: 'FOLLOW_TWITTER',
-    //       actionObject: 'actionObject'
-    //     },
-    //     {
-    //       iconUrl: 'iconUrl',
-    //       taskType: 'RETWEET',
-    //       actionObject: 'actionObject2'
-    //     }
-    //   ],
-    //   isCpaTask: true,
-    //   cpaTaskRewardUnit: 'cpaTaskRewardUnit',
-    //   cpaTaskRewardChainNetwork: 'polygon',
-    //   cpaTaskRewardBudget: 1,
-    //   cpaTaskBiddingType: 'LP_UV',
-    //   cpaTaskPerPrice: 1,
-    //   productizationLink: 'productizationLink'
-    // }
+    const params = {
+      accountAddress: address,
+      title: values.title,
+      desc: values.desc.toHTML(),
+      activityImg: values.activityImg,
+      launchStartTime: values.launchTime[0].format(),
+      launchEndTime: values.launchTime[1].format(),
+      isActionTask: values.isActionTask,
+      actionTaskRewardUnit: values.actionTaskReward.rewardName,
+      actionTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
+      actionTaskRewardNum: values.actionTaskRewardBudget / values.actionTaskRewardNum,
+      actionTaskRewardBudget: values.actionTaskRewardBudget,
+      actionTaskDrawTime: values.actionTaskDrawTime.format(),
+      actionTaskDTOS: taskList,
+      isCpaTask: values.isCpaTask,
+      cpaTaskRewardUnit: values.cpaTaskReward.rewardName,
+      cpaTaskRewardChainNetwork: values.cpaTaskReward.chainNetwork,
+      cpaTaskRewardBudget: values.cpaTaskRewardBudget,
+      cpaTaskBiddingType: values.cpaTaskBiddingType,
+      cpaTaskPerPrice: values.cpaTaskPerPrice,
+      productizationLink: ''
+    }
+    const ret = await request({
+      method: 'POST',
+      api: 'api/projectTask/saveProjectTask',
+      params
+    })
+    if (ret && ret.result) {
+      setCurrent(2)
+      setTaskResult(ret)
+    }
   }
 
   return (
@@ -144,7 +125,7 @@ const TaskForm = ({ setCurrent = () => {} }) => {
             hasFeedback
             rules={[{ validator: checkTitle }]}
           >
-            <Input style={{ width: '600px' }} />
+            <Input style={{ width: '800px' }} />
           </Form.Item>
           <Form.Item
             name="desc"
@@ -155,7 +136,6 @@ const TaskForm = ({ setCurrent = () => {} }) => {
           >
             <QuillEditor />
           </Form.Item>
-          {/* TODO */}
           <Form.Item
             name="activityImg"
             label="任务封面图片"
@@ -163,7 +143,7 @@ const TaskForm = ({ setCurrent = () => {} }) => {
             required
             hasFeedback
           >
-            <Upload
+            <Upload.Dragger
               name="file"
               accept="image/*"
               action="https://www.adventure3.tk/api/file/upload"
@@ -187,18 +167,15 @@ const TaskForm = ({ setCurrent = () => {} }) => {
                   const { response } = info.file
                   const { result } = response
                   form.setFieldValue('activityImg', result)
-                  setPreviewLogo(`https://db35z3hw6fbxp.cloudfront.net/${result}`)
                   message.success('上传成功')
                 }
               }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {previewLogo ? (
-                  <img style={{ width: 120, height: 120, marginBottom: 12 }} src={previewLogo} />
-                ) : null}
-                <Button icon={<UploadOutlined />}>点击上传</Button>
-              </div>
-            </Upload>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">点击或者拖拽图片到此处进行上传</p>
+            </Upload.Dragger>
           </Form.Item>
           <Form.Item
             name="launchTime"
@@ -206,7 +183,7 @@ const TaskForm = ({ setCurrent = () => {} }) => {
             rules={[{ required: true, message: '任务开始/结束时间不能为空' }]}
             hasFeedback
           >
-            <DatePicker.RangePicker showTime style={{ width: '600px' }} />
+            <DatePicker.RangePicker showTime style={{ width: '800px' }} />
           </Form.Item>
           <Form.Item name="isActionTask" label="是否开启行为奖励" valuePropName="checked">
             <Switch />
@@ -214,13 +191,27 @@ const TaskForm = ({ setCurrent = () => {} }) => {
           {isActionTask ? (
             <div>
               <Divider>行为任务配置</Divider>
-              <Form.Item
-                name="actionTaskReward"
-                label="奖励币种"
-                rules={[{ required: true, message: '行为奖励币种不能为空' }]}
-                hasFeedback
-              >
-                <MultiInputItem />
+              <Form.Item name="actionTaskReward" label="奖励币种" required>
+                <Input.Group compact>
+                  <Form.Item
+                    name={['actionTaskReward', 'chainNetwork']}
+                    noStyle
+                    required={[{ required: true, message: '链上环境不能为空' }]}
+                  >
+                    <Select style={{ width: 140 }}>
+                      <Select.Option key="Ethereum" value="Ethereum">
+                        Ethereum
+                      </Select.Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    name={['actionTaskReward', 'rewardName']}
+                    noStyle
+                    required={[{ required: true, message: '奖励币种不能为空' }]}
+                  >
+                    <Input style={{ width: 220 }} />
+                  </Form.Item>
+                </Input.Group>
               </Form.Item>
               <Form.Item
                 name="actionTaskRewardNum"
@@ -256,13 +247,34 @@ const TaskForm = ({ setCurrent = () => {} }) => {
           {isCpaTask ? (
             <div>
               <Divider>CPA 任务配置</Divider>
-              <Form.Item
-                name="cpaTaskReward"
-                label="奖励币种"
-                rules={[{ required: true, message: 'CPA 奖励币种不能为空' }]}
-                hasFeedback
-              >
-                <MultiSelectItem />
+              <Form.Item name="cpaTaskReward" label="奖励币种" required hasFeedback>
+                <Input.Group compact>
+                  <Form.Item
+                    name={['cpaTaskReward', 'chainNetwork']}
+                    noStyle
+                    required={[{ required: true, message: '链上环境不能为空' }]}
+                  >
+                    <Select style={{ width: 140 }}>
+                      <Select.Option key="Ethereum" value="Ethereum">
+                        Ethereum
+                      </Select.Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    name={['cpaTaskReward', 'rewardName']}
+                    noStyle
+                    required={[{ required: true, message: '奖励币种不能为空' }]}
+                  >
+                    <Select style={{ width: 220 }}>
+                      <Select.Option key="usdt" value="usdt">
+                        USDT
+                      </Select.Option>
+                      <Select.Option key="usdc" value="usdc">
+                        USDC
+                      </Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Input.Group>
               </Form.Item>
               <Form.Item
                 name="cpaTaskRewardBudget"
@@ -289,10 +301,10 @@ const TaskForm = ({ setCurrent = () => {} }) => {
                 hasFeedback
               >
                 <Select style={{ width: 360 }}>
-                  <Select.Option key="LP_EXP_UV" value="LP_EXP_UV">
+                  <Select.Option key="LP_UV" value="LP_UV">
                     按落地页访问 UV
                   </Select.Option>
-                  <Select.Option key="LP_CLK_UV" value="LP_CLK_UV">
+                  <Select.Option key="CONVERSION" value="CONVERSION">
                     按点击转化 UV
                   </Select.Option>
                 </Select>
@@ -309,11 +321,20 @@ const TaskForm = ({ setCurrent = () => {} }) => {
             新增任务
           </Button>
           <Table
-            rowKey="index"
+            rowKey="name"
+            scroll={{ x: 800 }}
             columns={[
+              {
+                title: '任务名称',
+                key: 'name',
+                dataIndex: 'name',
+                fixed: 'left',
+                width: 100
+              },
               {
                 title: '任务类型',
                 key: 'taskType',
+                width: 100,
                 render: (_, record) => {
                   const item = TASK_TYPE.find((t) => t.key === record.taskType)
                   if (item) {
@@ -331,11 +352,13 @@ const TaskForm = ({ setCurrent = () => {} }) => {
                       {record.actionObject}
                     </a>
                   )
-                }
+                },
+                width: 100
               },
               {
                 title: '任务图标',
                 key: 'iconUrl',
+                width: 100,
                 render: (_, record) => {
                   return (
                     <img
@@ -348,6 +371,7 @@ const TaskForm = ({ setCurrent = () => {} }) => {
               {
                 title: '操作',
                 key: 'operation',
+                width: 100,
                 render: (_, record) => {
                   return (
                     <Space>
@@ -363,9 +387,9 @@ const TaskForm = ({ setCurrent = () => {} }) => {
                         onClick={() => {
                           setTaskList((v) => {
                             const f = [...v]
-                            const index = f.findIndex((r) => r.index === record.index)
+                            const index = f.findIndex((r) => r.name === record.name)
                             f.splice(index, 1)
-                            return f.map((r, index) => ({ ...r, index }))
+                            return f
                           })
                         }}
                       >

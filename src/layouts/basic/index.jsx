@@ -11,7 +11,7 @@ const BasicLayout = () => {
           <ConnectButton />
         </div>
       </header>
-      <main className="container">
+      <main className={styles.content}>
         <Outlet />
       </main>
     </div>

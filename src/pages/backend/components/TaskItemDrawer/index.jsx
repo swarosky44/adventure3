@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Drawer, Form, Select, Input, Button, Upload, message } from 'antd'
-import { UploadOutlined } from '@ant-design/icons'
+import { InboxOutlined } from '@ant-design/icons'
 import { TASK_TYPE } from '@/utils/const'
 
 const TaskItemDrawer = ({
@@ -10,27 +10,24 @@ const TaskItemDrawer = ({
   close = () => {}
 }) => {
   const [form] = Form.useForm()
-  const [previewLogo, setPreviewLogo] = useState('')
 
   const onSubmit = (values) => {
     if (recordItem) {
       setTaskList((v) => {
         const f = [...v]
-        const index = f.findIndex((r) => r.index === recordItem.index)
+        const index = f.findIndex((r) => r.name === recordItem.name)
         f.splice(index, 1, values)
         return f
       })
     } else {
-      setTaskList((v) => [...v, values].map((item, index) => ({ ...item, index })))
+      setTaskList((v) => [...v, values])
     }
     close()
   }
 
   useEffect(() => {
-    console.info(recordItem)
     if (recordItem) {
       form.setFieldsValue(recordItem)
-      setPreviewLogo(recordItem.iconUrl)
     }
   }, [recordItem])
 
@@ -52,6 +49,14 @@ const TaskItemDrawer = ({
           </Select>
         </Form.Item>
         <Form.Item
+          name="name"
+          label="任务名称"
+          rules={[{ required: true, message: '任务名称' }]}
+          hasFeedback
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
           name="actionObject"
           label="任务链接"
           required
@@ -61,7 +66,7 @@ const TaskItemDrawer = ({
           <Input />
         </Form.Item>
         <Form.Item name="iconUrl" label="任务图标" valuePropName="file" required hasFeedback>
-          <Upload
+          <Upload.Dragger
             name="file"
             accept="image/*"
             action="https://www.adventure3.tk/api/file/upload"
@@ -85,25 +90,15 @@ const TaskItemDrawer = ({
                 const { response } = info.file
                 const { result } = response
                 form.setFieldValue('iconUrl', result)
-                setPreviewLogo(`https://db35z3hw6fbxp.cloudfront.net/${result}`)
                 message.success('上传成功')
               }
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {previewLogo ? (
-                <img
-                  style={{ width: 120, height: 120, marginBottom: 12 }}
-                  src={
-                    previewLogo.indexOf('http') >= 0
-                      ? previewLogo
-                      : `https://db35z3hw6fbxp.cloudfront.net/${previewLogo}`
-                  }
-                />
-              ) : null}
-              <Button icon={<UploadOutlined />}>点击上传</Button>
-            </div>
-          </Upload>
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">点击或者拖拽图片到此处进行上传</p>
+          </Upload.Dragger>
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">

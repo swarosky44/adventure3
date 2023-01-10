@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Form, Input, Upload, Button, message } from 'antd'
-import { UploadOutlined } from '@ant-design/icons'
+import { InboxOutlined } from '@ant-design/icons'
 import { ethers } from 'ethers'
 import { useAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -12,7 +12,6 @@ const BasicForm = ({ setCurrent = () => {} }) => {
   const { address, isConnected } = useAccount()
   const { openConnectModal } = useConnectModal()
   const [loading, setLoading] = useState(false)
-  const [previewLogo, setPreviewLogo] = useState('')
   // 校验项目名称
   const checkCommutityName = async (_, value = '') => {
     const fvalue = value.trim()
@@ -112,7 +111,6 @@ const BasicForm = ({ setCurrent = () => {} }) => {
         tags,
         whitePaper
       })
-      setPreviewLogo(logo)
     }
   }
 
@@ -138,7 +136,7 @@ const BasicForm = ({ setCurrent = () => {} }) => {
           <Input />
         </Form.Item>
         <Form.Item name="logo" label="项目LOGO" required valuePropName="file" hasFeedback>
-          <Upload
+          <Upload.Dragger
             name="file"
             accept="image/*"
             action="https://www.adventure3.tk/api/file/upload"
@@ -162,18 +160,15 @@ const BasicForm = ({ setCurrent = () => {} }) => {
                 const { response } = info.file
                 const { result } = response
                 form.setFieldValue('logo', result)
-                setPreviewLogo(`https://db35z3hw6fbxp.cloudfront.net/${result}`)
                 message.success('上传成功')
               }
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {previewLogo ? (
-                <img style={{ width: 'auto', height: 120, marginBottom: 12 }} src={previewLogo} />
-              ) : null}
-              <Button icon={<UploadOutlined />}>点击上传</Button>
-            </div>
-          </Upload>
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">点击或者拖拽图片到此处进行上传</p>
+          </Upload.Dragger>
         </Form.Item>
         <Form.Item
           name="owner"

@@ -1,6 +1,8 @@
 import { Button, Result, QRCode, Popover } from 'antd'
 
-const FormResult = () => {
+const FormResult = ({ data = null }) => {
+  const { result } = data
+  console.info(result)
   return (
     <div className="comp">
       <Result
