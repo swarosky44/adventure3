@@ -6,7 +6,7 @@ import FormResult from './components/FormResult'
 import './style.less'
 
 const AdvertiserForm = () => {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(0)
   const [taskResult, setTaskResult] = useState(null)
 
   const items = [
