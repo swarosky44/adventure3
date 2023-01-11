@@ -3,7 +3,7 @@ import { Steps, Card } from 'antd'
 import BasicForm from './components/BasicForm'
 import TaskForm from './components/TaskForm'
 import FormResult from './components/FormResult'
-import './style.less'
+import styles from './index.module.less'
 
 const AdvertiserForm = () => {
   const [current, setCurrent] = useState(0)
@@ -29,10 +29,10 @@ const AdvertiserForm = () => {
 
   return (
     <Card>
-      <header className="header">
+      <header className={styles.header}>
         <Steps current={current} items={items} />
       </header>
-      <main className="body">{items[current].content}</main>
+      <main className={styles.body}>{items[current].content}</main>
     </Card>
   )
 }

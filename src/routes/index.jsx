@@ -4,6 +4,7 @@ import BasicLayout from '@/layouts/basic'
 
 const Home = loadable(() => import('@/pages/home'))
 const Backend = loadable(() => import('@/pages/backend'))
+const Detail = loadable(() => import('@/pages/detail'))
 
 const routesConfig = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const routesConfig = createBrowserRouter([
       {
         path: 'backend',
         element: <Backend />
+      },
+      {
+        path: 'detail',
+        element: <Detail />
       },
       {
         index: true,

@@ -21,7 +21,7 @@ import { request } from '@/utils/request'
 import QuillEditor from '../quillEditor'
 import TaskItemDrawer from '../TaskItemDrawer'
 import { TASK_TYPE } from '@/utils/const'
-import './style.less'
+import styles from './index.module.less'
 
 const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const [drawerVisible, setDrawerVisible] = useState(false)
@@ -106,14 +106,14 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   }
 
   return (
-    <div className="comp">
+    <div className={styles.comp}>
       <ConfigProvider locale={zhCN}>
         <Form
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 14 }}
           name="task-form"
           form={form}
-          className="form"
+          className={styles.form}
           layout="vertical"
           scrollToFirstError={true}
           onFinish={onSubmit}

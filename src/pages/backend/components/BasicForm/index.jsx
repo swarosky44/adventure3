@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Form, Input, Upload, Button, message } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
-import { ethers } from 'ethers'
 import { useAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { request } from '@/utils/request'
-import './style.less'
+import styles from './index.module.less'
 
 const BasicForm = ({ setCurrent = () => {} }) => {
   const [form] = Form.useForm()
@@ -30,18 +29,10 @@ const BasicForm = ({ setCurrent = () => {} }) => {
     if (!fvalue) {
       throw new Error('智能合约地址不能为空')
     }
-    try {
-      const provider = new ethers.providers.JsonRpcProvider(
-        'https://mainnet.infura.io/v3/f48a6453561a4dc18999972babc7d540'
-      )
-      const code = await provider.getCode(value, 'latest')
-      if (code === '0x') {
-        throw new Error('请填写已部署的以太坊主链的智能合约地址')
-      }
-      return true
-    } catch (error) {
-      throw new Error('请填写已部署的以太坊主链的智能合约地址')
+    if (!/^0x[0-9a-fA-F]{40}$/gi.test(fvalue)) {
+      throw new Error('智能合约地址格式不正确')
     }
+    return true
   }
 
   // 提交
@@ -124,8 +115,14 @@ const BasicForm = ({ setCurrent = () => {} }) => {
   }, [address])
 
   return (
-    <div className="comp">
-      <Form name="basic-form" className="form" layout="vertical" form={form} onFinish={onSubmit}>
+    <div className={styles.comp}>
+      <Form
+        name="basic-form"
+        className={styles.form}
+        layout="vertical"
+        form={form}
+        onFinish={onSubmit}
+      >
         <Form.Item
           name="name"
           label="项目名称"
