@@ -16,6 +16,7 @@ import {
 } from 'antd'
 import { InboxOutlined, PlusOutlined } from '@ant-design/icons'
 import { useAccount } from 'wagmi'
+import dayjs from 'dayjs'
 import zhCN from 'antd/locale/zh_CN'
 import { request } from '@/utils/request'
 import QuillEditor from '../quillEditor'
@@ -30,6 +31,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const [form] = Form.useForm()
   const isActionTask = Form.useWatch('isActionTask', form)
   const isCpaTask = Form.useWatch('isCpaTask', form)
+  const launchTime = Form.useWatch('launchTime', form)
   const { address } = useAccount()
 
   const checkTitle = async (_, value) => {
@@ -183,7 +185,13 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
             rules={[{ required: true, message: '任务开始/结束时间不能为空' }]}
             hasFeedback
           >
-            <DatePicker.RangePicker showTime style={{ width: '800px' }} />
+            <DatePicker.RangePicker
+              showTime
+              style={{ width: '800px' }}
+              disabledDate={(current) => {
+                return current && current < dayjs().endOf('day')
+              }}
+            />
           </Form.Item>
           <Form.Item name="isActionTask" label="是否开启行为奖励" valuePropName="checked">
             <Switch />
@@ -235,9 +243,17 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
                 name="actionTaskDrawTime"
                 label="开奖时间"
                 rules={[{ required: true, message: '开奖时间不能为空' }]}
+                tooltip="* 开奖时间不能早于任务结束时间"
                 hasFeedback
               >
-                <DatePicker showTime style={{ width: '100%' }} />
+                <DatePicker
+                  showTime
+                  style={{ width: '100%' }}
+                  disabled={!(launchTime && launchTime[1])}
+                  disabledDate={(current) => {
+                    return current < launchTime[1].endOf('day')
+                  }}
+                />
               </Form.Item>
             </div>
           ) : null}
@@ -414,7 +430,10 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
             open={drawerVisible}
             recordItem={recordItem}
             setTaskList={setTaskList}
-            close={() => setDrawerVisible(false)}
+            close={() => {
+              setDrawerVisible(false)
+              setRecordItem(null)
+            }}
           />
         </Form>
       </ConfigProvider>

@@ -11,6 +11,11 @@ const TaskItemDrawer = ({
 }) => {
   const [form] = Form.useForm()
 
+  const onClose = () => {
+    form.resetFields()
+    close()
+  }
+
   const onSubmit = (values) => {
     if (recordItem) {
       setTaskList((v) => {
@@ -22,7 +27,7 @@ const TaskItemDrawer = ({
     } else {
       setTaskList((v) => [...v, values])
     }
-    close()
+    onClose()
   }
 
   useEffect(() => {
@@ -32,7 +37,7 @@ const TaskItemDrawer = ({
   }, [recordItem])
 
   return (
-    <Drawer title="任务项配置" open={open} onClose={close} destroyOnClose>
+    <Drawer title="任务项配置" open={open} onClose={onClose} destroyOnClose>
       <Form name="task-item-form" form={form} layout="vertical" onFinish={onSubmit}>
         <Form.Item
           name="taskType"

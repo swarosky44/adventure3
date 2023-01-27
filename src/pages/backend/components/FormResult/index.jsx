@@ -1,8 +1,8 @@
 import { Button, Result, QRCode, Popover } from 'antd'
 
-const FormResult = ({ data = null }) => {
+const FormResult = ({ data = null, setCurrent = () => {} }) => {
   const { result } = data
-  console.info(result)
+
   return (
     <div className="comp">
       <Result
@@ -30,8 +30,11 @@ const FormResult = ({ data = null }) => {
               />
             }
           >
-            <Button>扫码访问移动端</Button>
-          </Popover>
+            <Button type="primary">扫码访问移动端</Button>
+          </Popover>,
+          <Button key="back" onClick={() => setCurrent(0)}>
+            重新创建
+          </Button>
         ]}
       />
     </div>

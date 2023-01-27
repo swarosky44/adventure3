@@ -7,7 +7,7 @@ import styles from './index.module.less'
 
 const AdvertiserForm = () => {
   const [current, setCurrent] = useState(0)
-  const [taskResult, setTaskResult] = useState(null)
+  const [taskResult, setTaskResult] = useState({})
 
   const items = [
     {
@@ -23,7 +23,7 @@ const AdvertiserForm = () => {
     {
       title: '配置完成',
       key: 'result',
-      content: <FormResult data={taskResult} />
+      content: <FormResult setCurrent={setCurrent} data={taskResult} />
     }
   ]
 
@@ -32,7 +32,13 @@ const AdvertiserForm = () => {
       <header className={styles.header}>
         <Steps current={current} items={items} />
       </header>
-      <main className={styles.body}>{items[current].content}</main>
+      <main className={styles.body}>
+        {items.map((item, index) => (
+          <div key={index} style={{ display: current === index ? 'block' : 'none' }}>
+            {item.content}
+          </div>
+        ))}
+      </main>
     </Card>
   )
 }

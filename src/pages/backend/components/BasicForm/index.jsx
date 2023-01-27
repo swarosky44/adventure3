@@ -187,13 +187,10 @@ const BasicForm = ({ setCurrent = () => {} }) => {
         <Form.Item
           name="officialWebsite"
           label="项目官网"
-          rules={[
-            { required: true, message: '项目官网不能为空' },
-            { type: 'url', message: '请填写正确的项目官网链接' }
-          ]}
+          rules={[{ required: true, message: '项目官网不能为空' }]}
           hasFeedback
         >
-          <Input />
+          <Input addonBefore="https://" />
         </Form.Item>
         <Form.Item name="whitePaper" label="项目白皮书">
           <Input />
