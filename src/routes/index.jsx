@@ -8,16 +8,16 @@ const Detail = loadable(() => import('@/pages/detail'))
 
 const routesConfig = createBrowserRouter([
   {
+    path: '/detail',
+    element: <Detail />
+  },
+  {
     path: '/',
     element: <BasicLayout />,
     children: [
       {
         path: 'backend',
         element: <Backend />
-      },
-      {
-        path: 'detail',
-        element: <Detail />
       },
       {
         index: true,
