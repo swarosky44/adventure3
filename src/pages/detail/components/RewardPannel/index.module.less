@@ -1,5 +1,5 @@
 .module {
-  width: 450px;
+  max-width: 450px;
   overflow: hidden;
 }
 
@@ -167,4 +167,19 @@
 .countdownUnit {
   font-size: 14px;
   font-family: Poppins;
+}
+
+@media screen and (max-width: 1200px) {
+  .module {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+
+  .titleText {
+    font-size: 20px;
+  }
+
+  .card {
+    width: 100%;
+  }
 }

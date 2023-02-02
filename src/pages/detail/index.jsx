@@ -4,6 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import Particles from 'react-particles'
 import { loadFull } from 'tsparticles'
 import { PlusOutlined } from '@ant-design/icons'
+import { isMobile } from 'react-device-detect'
 import particlesOpt from './particles.json'
 import BasicPannel from './components/BasicPannel'
 import DescPannel from './components/DescPannel'
@@ -30,10 +31,12 @@ const Detail = () => {
         <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
         <div className={styles.right}>
           <ConnectButton />
-          <div className={styles.create} onClick={() => navigate('/backend')}>
-            <PlusOutlined style={{ marginRight: '8px' }} />
-            New Adventure
-          </div>
+          {!isMobile ? (
+            <div className={styles.create} onClick={() => navigate('/backend')}>
+              <PlusOutlined style={{ marginRight: '8px' }} />
+              New Adventure
+            </div>
+          ) : null}
         </div>
       </header>
       <main className={styles.module}>
@@ -44,11 +47,11 @@ const Detail = () => {
           options={particlesOpt}
         />
         <div className={styles.content}>
-          <div className={styles.column} style={{ marginRight: '100px' }}>
+          <div className={styles.column1}>
             <BasicPannel />
             <DescPannel />
           </div>
-          <div className={styles.column}>
+          <div className={styles.column2}>
             <RewardPannel />
           </div>
         </div>
