@@ -67,7 +67,8 @@ export default ({ data = {}, cpa = {}, action = {} }) => {
   // 渲染用户列表
   const userList = useMemo(() => {
     const listEl = []
-    for (let i = 0; i <= 10; i += 1) {
+    const total = action.finishCnt <= 10 ? action.finishCnt + 10 : action.finishCnt
+    for (let i = 0; i <= total; i += 1) {
       const index = Math.floor(Math.random() * (100 - 1)) + 1
       listEl.push(
         <img
