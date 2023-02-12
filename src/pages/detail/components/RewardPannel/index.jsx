@@ -1,8 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import styles from './index.module.less'
 
-export default () => {
-  const [countdown, setCountdown] = useState(Date.now() + 24 * 4 * 60 * 60 * 1000 - Date.now())
+const getInitCountdown = (drawTime = 0) => {
+  if (drawTime <= 0 || Number.isNaN(drawTime)) {
+    return 0
+  }
+  return drawTime - Date.now()
+}
+export default ({ data = {}, cpa = {}, action = {} }) => {
+  const [countdown, setCountdown] = useState(
+    getInitCountdown(new Date(data.actionTaskDrawTime).getTime())
+  )
 
   useEffect(() => {
     setInterval(() => {
@@ -46,6 +54,32 @@ export default () => {
     )
   }
 
+  // 渲染 TOKEN ICON
+  const renderTokenIcon = (tokenType = '') => {
+    if (tokenType === 'usdt') {
+      return 'https://db35z3hw6fbxp.cloudfront.net/usdt-icon.png'
+    } else if (tokenType === 'usdc') {
+      return 'https://db35z3hw6fbxp.cloudfront.net/coin-icon.png'
+    }
+    return 'https://db35z3hw6fbxp.cloudfront.net/tokens.png'
+  }
+
+  // 渲染用户列表
+  const userList = useMemo(() => {
+    const listEl = []
+    for (let i = 0; i <= 10; i += 1) {
+      const index = Math.floor(Math.random() * (100 - 1)) + 1
+      listEl.push(
+        <img
+          className={styles.userIcon}
+          key={i}
+          src={`https://db35z3hw6fbxp.cloudfront.net/user-icon${index}.png`}
+        />
+      )
+    }
+    return listEl
+  }, [action.finishCnt])
+
   return (
     <div className={styles.module}>
       <div className={styles.title}>
@@ -78,46 +112,27 @@ export default () => {
         </div>
         <div className={styles.cardLine}>
           <div className={styles.lineLable}>Total Budget</div>
-          <img
-            className={styles.lineIcon}
-            src="https://db35z3hw6fbxp.cloudfront.net/coin-icon.png"
-          />
-          <div className={styles.lineValue}>1000</div>
+          <img className={styles.lineIcon} src={renderTokenIcon(data.cpaTaskRewardUnit)} />
+          <div className={styles.lineValue}>{data.cpaTaskRewardBudget}</div>
           <div className={styles.lineUnit}>USDT</div>
         </div>
         <div className={styles.cardLine}>
           <div className={styles.lineLable}>CPA Commission</div>
-          <img
-            className={styles.lineIcon}
-            src="https://db35z3hw6fbxp.cloudfront.net/coin-icon.png"
-          />
-          <div className={styles.lineValue}>1000</div>
-          <div className={styles.lineUnit}>USDT</div>
-        </div>
-        <div className={styles.cardLine}>
-          <div className={styles.lineLable}>Commission Limit</div>
-          <img
-            className={styles.lineIcon}
-            src="https://db35z3hw6fbxp.cloudfront.net/coin-icon.png"
-          />
-          <div className={styles.lineValue}>1000</div>
+          <img className={styles.lineIcon} src={renderTokenIcon(data.cpaTaskRewardUnit)} />
+          <div className={styles.lineValue}>{data.cpaTaskPerPrice}</div>
           <div className={styles.lineUnit}>USDT</div>
         </div>
         <div className={styles.cardLineProcess}>
           <div className={styles.lineLable}>Remaining Budget</div>
           <div className={styles.process}>
-            <div className={styles.processLine} style={{ width: '50%' }} />
-            <div className={styles.processText}>600 / 1000 USDT</div>
+            <div
+              className={styles.processLine}
+              style={{ width: (cpa.finishCnt * data.cpaTaskPerPrice) / data.cpaTaskRewardBudget }}
+            />
+            <div className={styles.processText}>
+              {cpa.finishCnt * data.cpaTaskPerPrice} / {data.cpaTaskRewardBudget} USDT
+            </div>
           </div>
-        </div>
-        <div className={styles.cardLine} style={{ border: 'none' }}>
-          <div className={styles.lineLable}>CPA Point</div>
-          <img
-            className={styles.lineIcon}
-            src="https://db35z3hw6fbxp.cloudfront.net/p-coin-icon.png"
-          />
-          <div className={styles.lineValue}>80</div>
-          <div className={styles.lineUnit}>Points</div>
         </div>
       </div>
       <div className={styles.card}>
@@ -134,23 +149,21 @@ export default () => {
         </div>
         <div className={styles.cardLineCountdown}>{renderCountdown()}</div>
         <div className={styles.cardLine}>
-          <div className={styles.lineLable}>Token</div>
-          <img
-            className={styles.lineIcon}
-            src="https://db35z3hw6fbxp.cloudfront.net/coin-icon.png"
-          />
-          <div className={styles.lineValue}>1000</div>
-          <div className={styles.lineUnit}>USDT</div>
+          <div className={styles.lineLable}>Token Budget</div>
+          <img className={styles.lineIcon} src="https://db35z3hw6fbxp.cloudfront.net/tokens.png" />
+          <div className={styles.lineValue}>{data.actionTaskRewardNum}</div>
+          <div className={styles.lineUnit}>{data.actionTaskRewardUnit}</div>
         </div>
         <div className={styles.cardLine} style={{ border: 'none' }}>
           <div className={styles.lineLable}>Total Point</div>
-          <img
-            className={styles.lineIcon}
-            src="https://db35z3hw6fbxp.cloudfront.net/p-coin-icon.png"
-          />
-          <div className={styles.lineValue}>2000</div>
-          <div className={styles.lineUnit}>Points</div>
+          <img className={styles.lineIcon} src="https://db35z3hw6fbxp.cloudfront.net/tokens.png" />
+          <div className={styles.lineValue}>{data.actionTaskRewardBudget}</div>
+          <div className={styles.lineUnit}>{data.actionTaskRewardUnit}</div>
         </div>
+      </div>
+      <div className={styles.adventure}>
+        <div className={styles.titleText}>Adventure</div>
+        <div className={styles.userList}>{userList}</div>
       </div>
     </div>
   )
