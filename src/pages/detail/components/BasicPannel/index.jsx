@@ -16,7 +16,8 @@ export default ({
 }) => {
   const [shareCode, setShareCode] = useState('')
   const [operaVisible, setOperaVisible] = useState(false)
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
+
   const tasks = taskInstance
     .map((t) => {
       const dto = data.actionTaskDTOS.find((d) => `${d.id}` === `${t.actionTaskId}`)
@@ -56,8 +57,10 @@ export default ({
   }
 
   useEffect(() => {
-    queryShareId()
-  }, [])
+    if (isConnected) {
+      queryShareId()
+    }
+  }, [isConnected])
 
   // 渲染活动状态
   const renderActivityStatus = () => {

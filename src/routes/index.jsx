@@ -3,8 +3,10 @@ import { createBrowserRouter } from 'react-router-dom'
 import BasicLayout from '@/layouts/basic'
 
 const Home = loadable(() => import('@/pages/home'))
-const Backend = loadable(() => import('@/pages/backend'))
 const Detail = loadable(() => import('@/pages/detail'))
+const Backend = loadable(() => import('@/pages/backend'))
+const BackendList = loadable(() => import('@/pages/backendList'))
+const BackendDetail = loadable(() => import('@/pages/backendDetail'))
 
 const routesConfig = createBrowserRouter([
   {
@@ -12,11 +14,19 @@ const routesConfig = createBrowserRouter([
     element: <Detail />
   },
   {
-    path: '/',
+    path: '/backend',
     element: <BasicLayout />,
     children: [
       {
-        path: 'backend',
+        path: 'list',
+        element: <BackendList />
+      },
+      {
+        path: 'detail',
+        element: <BackendDetail />
+      },
+      {
+        path: 'create',
         element: <Backend />
       },
       {

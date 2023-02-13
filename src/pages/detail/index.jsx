@@ -86,7 +86,7 @@ const Detail = () => {
         <div className={styles.right}>
           <ConnectButton />
           {!isMobile ? (
-            <div className={styles.create} onClick={() => navigate('/backend')}>
+            <div className={styles.create} onClick={() => navigate('/backend/create')}>
               <PlusOutlined style={{ marginRight: '8px' }} />
               New Adventure
             </div>

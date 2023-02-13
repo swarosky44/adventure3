@@ -1,6 +1,7 @@
 import { message } from 'antd'
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { request } from '@/utils/request'
 import styles from './index.module.less'
 
@@ -19,7 +20,8 @@ export default ({
   const [itemClickStatus, setItemClickStatus] = useState(false)
   const [operaVisible, setOperaVisible] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
+  const { openConnectModal } = useConnectModal()
 
   const switchTaskIcon = () => {
     if (item.taskType.indexOf('Twitter') >= 0) {
@@ -36,6 +38,10 @@ export default ({
   }
 
   const open = () => {
+    if (!isConnected) {
+      openConnectModal()
+      return
+    }
     if (item.status === 'finish') return
     setOperaVisible((v) => !v)
   }
