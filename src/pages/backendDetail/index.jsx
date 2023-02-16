@@ -1,29 +1,197 @@
-import { Card, Descriptions } from 'antd'
+import { useEffect, useState } from 'react'
+import { Card, Descriptions, Spin, Result, Button, Table } from 'antd'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useAccount } from 'wagmi'
+import dayjs from 'dayjs'
+import { TASK_TYPE } from '@/utils/const'
+import { request } from '@/utils/request'
+import styles from './index.module.less'
 
 export default () => {
+  const [owner, setOwner] = useState(null)
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const { address } = useAccount()
+  const [params] = useSearchParams()
+  const navigate = useNavigate()
+  const id = params.get('id')
+
+  // 查询广告主信息
+  const queryTaskOwnerDetail = async () => {
+    const ret = await request({
+      api: 'api/project/queryProject',
+      params: { address }
+    })
+    if (ret && ret.result) {
+      setOwner(ret.result)
+    }
+  }
+
+  // 查询任务详情
+  const queryTaskDetail = async () => {
+    const ret = await request({
+      api: 'api/projectTask/projectTaskDetail',
+      params: {
+        id
+      }
+    })
+    if (ret && ret.result) {
+      setData(ret.result)
+    }
+  }
+
+  useEffect(() => {
+    Promise.all([queryTaskOwnerDetail(), queryTaskDetail()]).then(() => {
+      setLoading(false)
+    })
+  }, [])
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
+  if (!data && !owner) {
+    return (
+      <div className={styles.page}>
+        <Result
+          status="404"
+          title="404"
+          subTitle="Sorry, the page you visited does not exist."
+          extra={
+            <Button type="primary" onClick={() => navigate('/backend/list')}>
+              Back List
+            </Button>
+          }
+        />
+      </div>
+    )
+  }
+
   return (
     <div>
-      <Card>
+      <Card title="活动操作">
+        <Button onClick={() => navigate('/backend/list')} style={{ marginRight: '12px' }}>
+          返回列表
+        </Button>
+        <Button type="primary">退款</Button>
+      </Card>
+      <Card style={{ marginTop: '16px' }}>
         <Descriptions title="项目基础信息">
-          <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
-          <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
-          <Descriptions.Item label="Live">Hangzhou, Zhejiang</Descriptions.Item>
-          <Descriptions.Item label="Remark">empty</Descriptions.Item>
-          <Descriptions.Item label="Address">
-            No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China
+          <Descriptions.Item label="Logo">
+            <img className={styles.logo} src={owner.logo} />
+          </Descriptions.Item>
+          <Descriptions.Item label="名字">{owner.name}</Descriptions.Item>
+          <Descriptions.Item label="描述">{owner.desc}</Descriptions.Item>
+          <Descriptions.Item label="Github">
+            <a target="_blank" href={owner.githubAddress}>
+              {owner.githubAddress}
+            </a>
+          </Descriptions.Item>
+          <Descriptions.Item label="官网">
+            <a
+              target="_blank"
+              href={`https://${owner.officialWebsite}`}
+            >{`https://${owner.officialWebsite}`}</a>
+          </Descriptions.Item>
+          <Descriptions.Item label="白皮书">
+            <a target="_blank" href={owner.whitePaper}>
+              {owner.whitePaper}
+            </a>
+          </Descriptions.Item>
+          <Descriptions.Item label="广告主">{owner.owner}</Descriptions.Item>
+          <Descriptions.Item label="投资方">{owner.investmentInstitutions}</Descriptions.Item>
+          <Descriptions.Item label="标签">{owner.tags}</Descriptions.Item>
+          <Descriptions.Item label={`ContractAddress(${owner.chainNetwork})`} span={3}>
+            {owner.contractAddress}
           </Descriptions.Item>
         </Descriptions>
       </Card>
       <Card style={{ marginTop: '16px' }}>
-        <Descriptions title="任务信息">
-          <Descriptions.Item label="UserName">Zhou Maomao</Descriptions.Item>
-          <Descriptions.Item label="Telephone">1810000000</Descriptions.Item>
-          <Descriptions.Item label="Live">Hangzhou, Zhejiang</Descriptions.Item>
-          <Descriptions.Item label="Remark">empty</Descriptions.Item>
-          <Descriptions.Item label="Address">
-            No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China
+        <Descriptions title="活动信息">
+          <Descriptions.Item label="活动页面">
+            <a
+              target="_blank"
+              href={`https://www.adventure3.tk/detail?id=${data.projectTaskId}`}
+            >{`https://www.adventure3.tk/detail?id=${data.projectTaskId}`}</a>
           </Descriptions.Item>
         </Descriptions>
+      </Card>
+      <Card style={{ marginTop: '16px' }}>
+        <Descriptions title="CPA 任务信息">
+          <Descriptions.Item label={`奖励币种(${data.cpaTaskRewardChainNetwork})`}>
+            {data.cpaTaskRewardUnit}
+          </Descriptions.Item>
+          <Descriptions.Item label="奖励预算">{data.cpaTaskRewardBudget}</Descriptions.Item>
+          <Descriptions.Item label="奖励单价">{data.cpaTaskPerPrice}</Descriptions.Item>
+        </Descriptions>
+      </Card>
+      <Card style={{ marginTop: '16px' }}>
+        <Descriptions title="用户任务信息">
+          <Descriptions.Item label={`奖励币种(${data.actionTaskRewardChainNetwork})`}>
+            {data.actionTaskRewardUnit}
+          </Descriptions.Item>
+          <Descriptions.Item label="奖励预算">{data.actionTaskRewardBudget}</Descriptions.Item>
+          <Descriptions.Item label="奖励人数">{data.actionTaskRewardNum}</Descriptions.Item>
+          <Descriptions.Item label="开奖时间">
+            {dayjs(data.actionTaskDrawTime).format('YYYY-MM-DD HH:mm:ss')}
+          </Descriptions.Item>
+        </Descriptions>
+
+        <Table
+          rowKey="name"
+          scroll={{ x: 800 }}
+          columns={[
+            {
+              title: '任务名称',
+              key: 'name',
+              dataIndex: 'name',
+              fixed: 'left',
+              width: 100
+            },
+            {
+              title: '任务类型',
+              key: 'taskType',
+              width: 100,
+              render: (_, record) => {
+                const item = TASK_TYPE.find((t) => t.key === record.taskType)
+                if (item) {
+                  return item.name
+                }
+                return '-'
+              }
+            },
+            {
+              title: '任务链接',
+              key: 'actionObject',
+              render: (_, record) => {
+                return (
+                  <a target="_blank" href={record.actionObject}>
+                    {record.actionObject}
+                  </a>
+                )
+              },
+              width: 100
+            },
+            {
+              title: '任务图标',
+              key: 'iconUrl',
+              width: 100,
+              render: (_, record) => {
+                return (
+                  <img
+                    style={{ width: 'atuo', height: 32 }}
+                    src={`https://db35z3hw6fbxp.cloudfront.net/${record.iconUrl}`}
+                  />
+                )
+              }
+            }
+          ]}
+          dataSource={data.actionTaskDTOS}
+        />
       </Card>
     </div>
   )
