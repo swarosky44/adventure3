@@ -6,7 +6,6 @@ import {
   Upload,
   Button,
   DatePicker,
-  Switch,
   Divider,
   Select,
   Table,
@@ -29,8 +28,6 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const [taskList, setTaskList] = useState([])
   const [recordItem, setRecordItem] = useState(null)
   const [form] = Form.useForm()
-  const isActionTask = Form.useWatch('isActionTask', form)
-  const isCpaTask = Form.useWatch('isCpaTask', form)
   const launchTime = Form.useWatch('launchTime', form)
   const { address } = useAccount()
 
@@ -81,14 +78,14 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       activityImg: values.activityImg,
       launchStartTime: values.launchTime[0].format(),
       launchEndTime: values.launchTime[1].format(),
-      isActionTask: values.isActionTask,
+      isActionTask: true,
       actionTaskRewardUnit: values.actionTaskReward.rewardName,
       actionTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
       actionTaskRewardNum: values.actionTaskRewardBudget / values.actionTaskRewardNum,
       actionTaskRewardBudget: values.actionTaskRewardBudget,
       actionTaskDrawTime: values.actionTaskDrawTime.format(),
       actionTaskDTOS: taskList,
-      isCpaTask: values.isCpaTask,
+      isCpaTask: true,
       cpaTaskRewardUnit: values.cpaTaskReward.rewardName,
       cpaTaskRewardChainNetwork: values.cpaTaskReward.chainNetwork,
       cpaTaskRewardBudget: values.cpaTaskRewardBudget,
@@ -193,140 +190,139 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
               }}
             />
           </Form.Item>
-          <Form.Item name="isActionTask" label="是否开启行为奖励" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          {isActionTask ? (
-            <div>
-              <Divider>行为任务配置</Divider>
-              <Form.Item name="actionTaskReward" label="奖励币种" required>
-                <Input.Group compact>
-                  <Form.Item
-                    name={['actionTaskReward', 'chainNetwork']}
-                    noStyle
-                    required={[{ required: true, message: '链上环境不能为空' }]}
-                  >
-                    <Select style={{ width: 140 }}>
-                      <Select.Option key="Ethereum" value="Ethereum">
-                        Ethereum
-                      </Select.Option>
-                    </Select>
-                  </Form.Item>
-                  <Form.Item
-                    name={['actionTaskReward', 'rewardName']}
-                    noStyle
-                    required={[{ required: true, message: '奖励币种不能为空' }]}
-                  >
-                    <Input style={{ width: 220 }} />
-                  </Form.Item>
-                </Input.Group>
-              </Form.Item>
-              <Form.Item
-                name="actionTaskRewardNum"
-                label="奖励人数"
-                required
-                rules={[{ validator: checkShareLimit }]}
-                hasFeedback
-              >
-                <InputNumber style={{ width: '360px' }} />
-              </Form.Item>
-              <Form.Item
-                name="actionTaskRewardBudget"
-                label="奖励预算"
-                required
-                rules={[{ validator: checkBudget }]}
-                hasFeedback
-              >
-                <InputNumber style={{ width: '360px' }} />
-              </Form.Item>
-              <Form.Item
-                name="actionTaskDrawTime"
-                label="开奖时间"
-                rules={[{ required: true, message: '开奖时间不能为空' }]}
-                tooltip="* 开奖时间不能早于任务结束时间"
-                hasFeedback
-              >
-                <DatePicker
-                  showTime
-                  style={{ width: '100%' }}
-                  disabled={!(launchTime && launchTime[1])}
-                  disabledDate={(current) => {
-                    return current < launchTime[1].endOf('day')
-                  }}
-                />
-              </Form.Item>
-            </div>
-          ) : null}
-          <Form.Item name="isCpaTask" label="是否开启CPA奖励" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          {isCpaTask ? (
-            <div>
-              <Divider>CPA 任务配置</Divider>
-              <Form.Item name="cpaTaskReward" label="奖励币种" required hasFeedback>
-                <Input.Group compact>
-                  <Form.Item
-                    name={['cpaTaskReward', 'chainNetwork']}
-                    noStyle
-                    required={[{ required: true, message: '链上环境不能为空' }]}
-                  >
-                    <Select style={{ width: 140 }}>
-                      <Select.Option key="Ethereum" value="Ethereum">
-                        Ethereum
-                      </Select.Option>
-                    </Select>
-                  </Form.Item>
-                  <Form.Item
-                    name={['cpaTaskReward', 'rewardName']}
-                    noStyle
-                    required={[{ required: true, message: '奖励币种不能为空' }]}
-                  >
-                    <Select style={{ width: 220 }}>
-                      <Select.Option key="usdt" value="usdt">
-                        USDT
-                      </Select.Option>
-                      <Select.Option key="usdc" value="usdc">
-                        USDC
-                      </Select.Option>
-                    </Select>
-                  </Form.Item>
-                </Input.Group>
-              </Form.Item>
-              <Form.Item
-                name="cpaTaskRewardBudget"
-                label="奖励预算"
-                required
-                rules={[{ validator: checkBudget }]}
-                hasFeedback
-              >
-                <InputNumber style={{ width: 360 }} />
-              </Form.Item>
-              <Form.Item
-                name="cpaTaskPerPrice"
-                label="奖励单价"
-                required
-                rules={[{ validator: checkCpaUnitPrice }]}
-                hasFeedback
-              >
-                <InputNumber style={{ width: 360 }} />
-              </Form.Item>
-              <Form.Item
-                name="cpaTaskBiddingType"
-                label="出价方式"
-                rules={[{ required: true, message: 'CPA 奖励出价方式不能为空' }]}
-                hasFeedback
-              >
-                <Select style={{ width: 360 }}>
-                  <Select.Option key="LP_UV" value="LP_UV">
-                    按落地页访问 UV
-                  </Select.Option>
-                  <Select.Option key="CONVERSION" value="CONVERSION">
-                    按点击转化 UV
-                  </Select.Option>
-                </Select>
-              </Form.Item>
-            </div>
-          ) : null}
+
+          <div>
+            <Divider>行为任务配置</Divider>
+            <Form.Item name="actionTaskReward" label="奖励币种" required>
+              <Input.Group compact>
+                <Form.Item
+                  name={['actionTaskReward', 'chainNetwork']}
+                  noStyle
+                  required={[{ required: true, message: '链上环境不能为空' }]}
+                >
+                  <Select style={{ width: 140 }}>
+                    <Select.Option key="Ethereum" value="Ethereum">
+                      Ethereum
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name={['actionTaskReward', 'rewardName']}
+                  noStyle
+                  required={[{ required: true, message: '奖励币种不能为空' }]}
+                >
+                  <Select style={{ width: 220 }}>
+                    <Select.Option key="usdt" value="usdt">
+                      USDT
+                    </Select.Option>
+                    <Select.Option key="usdc" value="usdc">
+                      USDC
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+              </Input.Group>
+            </Form.Item>
+            <Form.Item
+              name="actionTaskRewardNum"
+              label="奖励人数"
+              required
+              rules={[{ validator: checkShareLimit }]}
+              hasFeedback
+            >
+              <InputNumber style={{ width: '360px' }} />
+            </Form.Item>
+            <Form.Item
+              name="actionTaskRewardBudget"
+              label="奖励预算"
+              required
+              rules={[{ validator: checkBudget }]}
+              hasFeedback
+            >
+              <InputNumber style={{ width: '360px' }} />
+            </Form.Item>
+            <Form.Item
+              name="actionTaskDrawTime"
+              label="开奖时间"
+              rules={[{ required: true, message: '开奖时间不能为空' }]}
+              tooltip="* 开奖时间不能早于任务结束时间"
+              hasFeedback
+            >
+              <DatePicker
+                showTime
+                style={{ width: '100%' }}
+                disabled={!(launchTime && launchTime[1])}
+                disabledDate={(current) => {
+                  return current < launchTime[1].endOf('day')
+                }}
+              />
+            </Form.Item>
+          </div>
+
+          <div>
+            <Divider>CPA 任务配置</Divider>
+            <Form.Item name="cpaTaskReward" label="奖励币种" required hasFeedback>
+              <Input.Group compact>
+                <Form.Item
+                  name={['cpaTaskReward', 'chainNetwork']}
+                  noStyle
+                  required={[{ required: true, message: '链上环境不能为空' }]}
+                >
+                  <Select style={{ width: 140 }}>
+                    <Select.Option key="Ethereum" value="Ethereum">
+                      Ethereum
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name={['cpaTaskReward', 'rewardName']}
+                  noStyle
+                  required={[{ required: true, message: '奖励币种不能为空' }]}
+                >
+                  <Select style={{ width: 220 }}>
+                    <Select.Option key="usdt" value="usdt">
+                      USDT
+                    </Select.Option>
+                    <Select.Option key="usdc" value="usdc">
+                      USDC
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+              </Input.Group>
+            </Form.Item>
+            <Form.Item
+              name="cpaTaskRewardBudget"
+              label="奖励预算"
+              required
+              rules={[{ validator: checkBudget }]}
+              hasFeedback
+            >
+              <InputNumber style={{ width: 360 }} />
+            </Form.Item>
+            <Form.Item
+              name="cpaTaskPerPrice"
+              label="奖励单价"
+              required
+              rules={[{ validator: checkCpaUnitPrice }]}
+              hasFeedback
+            >
+              <InputNumber style={{ width: 360 }} />
+            </Form.Item>
+            <Form.Item
+              name="cpaTaskBiddingType"
+              label="出价方式"
+              rules={[{ required: true, message: 'CPA 奖励出价方式不能为空' }]}
+              hasFeedback
+            >
+              <Select style={{ width: 360 }}>
+                <Select.Option key="LP_UV" value="LP_UV">
+                  按落地页访问 UV
+                </Select.Option>
+                <Select.Option key="CONVERSION" value="CONVERSION">
+                  按点击转化 UV
+                </Select.Option>
+              </Select>
+            </Form.Item>
+          </div>
           <Divider>任务项配置</Divider>
           <Button
             type="primary"
