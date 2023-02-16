@@ -7,13 +7,16 @@ export default ({ data = {}, owner = {} }) => {
 
   return (
     <div className={styles.task} onClick={() => navigate(`/backend/detail?id=${data.id}`)}>
-      <img className={styles.cover} src="https://db35z3hw6fbxp.cloudfront.net/mock.png" />
+      <div className={styles.coverWrapper}>
+        <img
+          className={styles.cover}
+          src={`https://db35z3hw6fbxp.cloudfront.net/${data.activityImg}`}
+        />
+      </div>
       <div className={styles.info}>
         <div className={styles.taskInfo}>
           <img className={styles.taskIcon} src={owner.logo} />
-          <span className={styles.taskTitle}>
-            ADVENTURE NAME ADVENTURE NAME ADVENTURE NAME ADVENTURE NAME
-          </span>
+          <span className={styles.taskTitle}>{data.title}</span>
         </div>
         <div className={styles.tags}>
           <span className={styles.tag}>
