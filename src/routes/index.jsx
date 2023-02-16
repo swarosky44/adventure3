@@ -6,7 +6,8 @@ const Home = loadable(() => import('@/pages/home'))
 const Detail = loadable(() => import('@/pages/detail'))
 const Backend = loadable(() => import('@/pages/backend'))
 const BackendList = loadable(() => import('@/pages/backendList'))
-const BackendDetail = loadable(() => import('@/pages/backendDetail'))
+const BackendDetail = loadable(() => import('@/pages/backendDetail'));
+const Profile = loadable(() => import('@/pages/profile'));
 
 const routesConfig = createBrowserRouter([
   {
@@ -34,6 +35,11 @@ const routesConfig = createBrowserRouter([
         element: <Home />
       }
     ]
+  },
+  {
+    //  create a route /profile
+    path: '/profile',
+    element: <Profile />
   }
 ])
 

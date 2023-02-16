@@ -3,9 +3,9 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import Particles from 'react-particles'
 import { loadFull } from 'tsparticles'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined } from '@ant-design/icons';
 import { isMobile } from 'react-device-detect'
-import { useAccount } from 'wagmi'
+import { useAccount } from 'wagmi';
 import { Result, Spin } from 'antd'
 import { request } from '../../utils/request'
 import particlesOpt from './particles.json'
