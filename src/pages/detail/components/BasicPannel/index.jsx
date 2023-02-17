@@ -80,14 +80,11 @@ export default ({
 
   return (
     <div className={styles.module}>
-      <div className={styles.company}>
+      <div className={styles.title}>
         <img
           className={styles.companyLogo}
           src={`https://db35z3hw6fbxp.cloudfront.net/${data.activityImg}`}
         />
-        <span className={styles.companyName}>{data.name}</span>
-      </div>
-      <div className={styles.title}>
         {data.title}
         <img
           className={styles.companyVerifyIcon}
