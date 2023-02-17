@@ -11,6 +11,7 @@ const BasicForm = ({ setCurrent = () => {} }) => {
   const { address, isConnected } = useAccount()
   const { openConnectModal } = useConnectModal()
   const [loading, setLoading] = useState(false)
+
   // 校验项目名称
   const checkCommutityName = async (_, value = '') => {
     const fvalue = value.trim()

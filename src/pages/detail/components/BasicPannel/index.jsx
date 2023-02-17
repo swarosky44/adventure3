@@ -12,6 +12,7 @@ export default ({
   taskInstance = [],
   projectTaskId = '',
   shareId = '',
+  isSecurity = false,
   queryProjectTaskStatus = () => {}
 }) => {
   const [shareCode, setShareCode] = useState('')
@@ -90,6 +91,12 @@ export default ({
           className={styles.companyVerifyIcon}
           src="https://db35z3hw6fbxp.cloudfront.net/company-verify-icon.png"
         />
+        {isSecurity ? (
+          <img
+            className={styles.companySecurityIcon}
+            src="https://db35z3hw6fbxp.cloudfront.net/shield.png"
+          />
+        ) : null}
       </div>
       <div className={styles.tags}>
         <div className={styles.tag}>

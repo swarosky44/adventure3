@@ -15,12 +15,14 @@ import RewardPannel from './components/RewardPannel'
 import styles from './index.module.less'
 
 const Detail = () => {
+  const [owner, setOwner] = useState(null)
   const [loading, setLoading] = useState(true)
   const [actionTaskInstance, setActionTaskInstance] = useState(null)
   const [actionTaskStatus, setActionTaskStatus] = useState(null)
   const [cpaTaskInstance, setCpaTaskInstance] = useState(null)
   // const [cpaTaskStatus, setCpaTaskStatus] = useState(null)
   const [projectTaskDTO, setProjectTaskDTO] = useState(null)
+  const [isSecurity, setIsSecurity] = useState(false)
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const { address } = useAccount()
@@ -33,6 +35,21 @@ const Detail = () => {
 
   const particlesLoaded = useCallback(() => {}, [])
 
+  // 查询广告主详情
+  const queryProjectOwner = async () => {
+    const { accountAddress } = projectTaskDTO
+    if (accountAddress) {
+      const ret = await request({
+        api: 'api/project/queryProject',
+        params: { address: accountAddress }
+      })
+      if (ret && ret.result) {
+        setOwner(ret.result)
+      }
+    }
+  }
+
+  // 查询任务详情
   const queryProjectTaskStatus = async () => {
     const ret = await request({
       api: 'api/taskInstance/queryProjectTaskStatus',
@@ -58,6 +75,23 @@ const Detail = () => {
     }
     setLoading(false)
   }
+
+  useEffect(() => {
+    if (owner) {
+      window
+        .fetch(
+          `https://api.gopluslabs.io/api/v1/dapp_security?url=https://${owner.officialWebsite}`
+        )
+        .then((ret) => ret.json())
+        .then(() => setIsSecurity(true))
+    }
+  }, [owner])
+
+  useEffect(() => {
+    if (projectTaskDTO && projectTaskDTO.accountAddress && !owner) {
+      queryProjectOwner()
+    }
+  }, [projectTaskDTO])
 
   useEffect(() => {
     queryProjectTaskStatus()
@@ -107,6 +141,7 @@ const Detail = () => {
               taskInstance={actionTaskInstance}
               projectTaskId={id}
               shareId={shareId}
+              isSecurity={isSecurity}
               queryProjectTaskStatus={queryProjectTaskStatus}
             />
             <DescPannel data={projectTaskDTO} />
