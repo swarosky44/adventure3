@@ -135,7 +135,7 @@ export default ({
                       message.success('Create success! Publish Content to birng in users')
                     }
                   >
-                    <div className={styles.doBtn}>CREATE URL</div>
+                    <div className={styles.doBtn}>COPY URL</div>
                   </CopyToClipboard>
                 </div>
               </div>
