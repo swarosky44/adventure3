@@ -7,7 +7,8 @@ import { PlusOutlined } from '@ant-design/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
 import { Result, Spin } from 'antd'
-import { request } from '../../utils/request'
+import Das from 'das-sdk'
+import { request } from '@/utils/request'
 import particlesOpt from './particles.json'
 import BasicPannel from './components/BasicPannel'
 import DescPannel from './components/DescPannel'
@@ -84,6 +85,10 @@ const Detail = () => {
         )
         .then((ret) => ret.json())
         .then(() => setIsSecurity(true))
+      const das = new Das({
+        url: 'https://indexer-v1.did.id'
+      })
+      das.records(owner.accountAddress).then(console.log).catch(console.warn)
     }
   }, [owner])
 
