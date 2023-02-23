@@ -51,7 +51,7 @@ export default () => {
       console.info(csvData)
 
       const cpaPromiseArr = csvData
-        .filter((d) => `${d['是否有CPA奖励']}` === 'true')
+        .filter((d) => `${d['是否有CPA奖励']}`.toLocaleLowerCase() === 'true')
         .map((row) => {
           const d = [row['用户地址'], row['合约地址'], row['CPA奖励金额'], 1]
           return encryptoDataFormat(d).then((ret) => ({
@@ -63,7 +63,7 @@ export default () => {
         })
 
       const taskPromiseArr = csvData
-        .filter((d) => `${d['是否有任务奖励']}` === 'true')
+        .filter((d) => `${d['是否有任务奖励']}`.toLocaleLowerCase() === 'true')
         .map((row) => {
           const d = [row['用户地址'], row['合约地址'], row['任务奖励金额'], 0]
           return encryptoDataFormat(d).then((ret) => ({
@@ -110,7 +110,6 @@ export default () => {
       return Object.values(item)
     })
     const output = [headers, ...body].map((row) => row.join(',')).join('\r\n')
-    console.info(output)
     const BOM = '\uFEFF'
     const blob = new Blob([BOM + output], { type: 'text/csv' })
     try {
@@ -128,7 +127,7 @@ export default () => {
   // 上传数据到数据库
   const onUpload = async () => {
     const ret = await request({
-      api: 'api/importProjectTaskFeeInfo',
+      api: 'api/taskInstance/importProjectTaskFeeInfo',
       method: 'POST',
       params: dataSource.map((d) => ({
         address: d['用户地址'],
@@ -147,53 +146,15 @@ export default () => {
 
   // 查询原始数据
   const getOriginalData = async () => {
-    // const ret = await request({
-    //   api: 'api/exportProjectTaskResult',
-    //   params: {
-    //     projectTaskId: id
-    //   }
-    // })
-    setOriginalData([
-      {
-        address: '0x3038e410Cc34356eEAB3696c14495F4940856bE1',
-        campaignAddress: '0xffE85d249eF7E68D8Da5DCb55Ff0cdFDD2149b8B',
-        projectTaskId: 1,
-        cpaTaskRewardUnit: 'unit1',
-        cpaTaskRewardChainNetwork: 'network1',
-        cpaTaskRewardAmount: 1,
-        cpaTaskEnable: true,
-        actionTaskRewardUnit: 'unit1',
-        actionTaskRewardChainNetwork: 'network1',
-        actionTaskRewardAmount: 10,
-        actionTaskEnable: true
-      },
-      {
-        address: '0x3038e410Cc34356eEAB3696c14495F4940856bE2',
-        campaignAddress: '0xffE85d249eF7E68D8Da5DCb55Ff0cdFDD2149b8B',
-        projectTaskId: 1,
-        cpaTaskRewardUnit: 'unit1',
-        cpaTaskRewardChainNetwork: 'network1',
-        cpaTaskRewardAmount: 2,
-        cpaTaskEnable: true,
-        actionTaskRewardUnit: 'unit1',
-        actionTaskRewardChainNetwork: 'network1',
-        actionTaskRewardAmount: 20,
-        actionTaskEnable: true
-      },
-      {
-        address: '0x3038e410Cc34356eEAB3696c14495F4940856bE3',
-        campaignAddress: '0xffE85d249eF7E68D8Da5DCb55Ff0cdFDD2149b8B',
-        projectTaskId: 1,
-        cpaTaskRewardUnit: 'unit1',
-        cpaTaskRewardChainNetwork: 'network1',
-        cpaTaskRewardAmount: 3,
-        cpaTaskEnable: true,
-        actionTaskRewardUnit: 'unit1',
-        actionTaskRewardChainNetwork: 'network1',
-        actionTaskRewardAmount: 30,
-        actionTaskEnable: true
+    const ret = await request({
+      api: 'api/taskInstance/exportProjectTaskResult',
+      params: {
+        projectTaskId: id
       }
-    ])
+    })
+    if (ret && ret.result && ret.result.length) {
+      setOriginalData(ret.result)
+    }
   }
 
   useEffect(() => {
