@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import {
   Form,
   Input,
@@ -14,13 +14,21 @@ import {
   Space
 } from 'antd'
 import { InboxOutlined, PlusOutlined } from '@ant-design/icons'
-import { useAccount } from 'wagmi'
+import { ethers } from 'ethers'
+import { useAccount, useSigner, useNetwork, useSwitchNetwork } from 'wagmi'
 import dayjs from 'dayjs'
 import zhCN from 'antd/locale/zh_CN'
-import { request } from '@/utils/request'
+import { request, getCurrentGasPrice } from '@/utils/request'
 import QuillEditor from '../quillEditor'
 import TaskItemDrawer from '../TaskItemDrawer'
-import { TASK_TYPE } from '@/utils/const'
+import {
+  TASK_TYPE,
+  ENV,
+  AD3HUB_ADDRESS,
+  USDT_TOKEN_ADDRESS,
+  USDC_TOKEN_ADDRESS
+} from '@/utils/const'
+import Ad3HubAbi from '@/utils/Ad3Hub.json'
 import styles from './index.module.less'
 
 const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
@@ -28,9 +36,14 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const [taskList, setTaskList] = useState([])
   const [recordItem, setRecordItem] = useState(null)
   const [form] = Form.useForm()
-  const launchTime = Form.useWatch('launchTime', form)
   const { address } = useAccount()
+  const { data: signer } = useSigner()
+  const { chain } = useNetwork()
+  const { switchNetwork } = useSwitchNetwork()
 
+  const launchTime = Form.useWatch('launchTime', form)
+
+  // 校验标题
   const checkTitle = async (_, value) => {
     const fvalue = value.trim()
     if (!fvalue) {
@@ -42,6 +55,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
     return true
   }
 
+  // 校验描述
   const checkDesc = async (_, value) => {
     if (value.isEmpty()) {
       throw new Error('任务描述不能为空')
@@ -49,6 +63,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
     return true
   }
 
+  // 校验额度
   const checkShareLimit = async (_, value = 0) => {
     if (value <= 0) {
       throw new Error('奖励人数应该大于 0')
@@ -56,6 +71,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
     return true
   }
 
+  // 校验预算
   const checkBudget = async (_, value = 0) => {
     if (value <= 0) {
       throw new Error('奖励预算应该大于 0')
@@ -63,6 +79,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
     return true
   }
 
+  // 校验单价
   const checkCpaUnitPrice = async (_, value = 0) => {
     if (value <= 0) {
       throw new Error('Cpa 奖励单价应该大于 0')
@@ -70,9 +87,149 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
     return true
   }
 
+  // 申请货币额度
+  const tokenApprove = async ({ cpaToken, cpaBonusBudget, taskToken, taskBonusBudget }) => {
+    const feeData = await getCurrentGasPrice()
+    const gasParams =
+      ENV === 'test'
+        ? {}
+        : { maxFeePerGas: feeData.maxFeePerGas, maxPriorityFeePerGas: feeData.maxPriorityFeePerGas }
+    const approveCpaToken = () => {
+      return new Promise((resolve) => {
+        cpaToken.approve(
+          AD3HUB_ADDRESS,
+          ethers.utils.parseUnits(cpaBonusBudget.toString(), 6),
+          gasParams
+        )
+        cpaToken.once('Approval', () => {
+          resolve({ success: true, type: 'cpaToken' })
+        })
+      })
+    }
+    const approveTaskToken = () => {
+      return new Promise((resolve) => {
+        taskToken.approve(
+          AD3HUB_ADDRESS,
+          ethers.utils.parseUnits(taskBonusBudget.toString(), 6),
+          gasParams
+        )
+        taskToken.once('Approval', () => {
+          resolve({ success: true, type: 'taskToken' })
+        })
+      })
+    }
+    return await Promise.all([approveCpaToken(), approveTaskToken()])
+  }
+
+  // 创建活动合约实例
+  const createCampaign = async ({
+    contract,
+    cpaBonusBudget,
+    taskBonusBudget,
+    cpaPaymentToken,
+    taskPaymentToken
+  }) => {
+    const feeData = await getCurrentGasPrice()
+    return new Promise((resolve) => {
+      contract.createCampaign(
+        ethers.utils.parseUnits(cpaBonusBudget.toString(), 6),
+        ethers.utils.parseUnits(taskBonusBudget.toString(), 6),
+        cpaPaymentToken,
+        taskPaymentToken,
+        { maxFeePerGas: feeData.maxFeePerGas, maxPriorityFeePerGas: feeData.maxPriorityFeePerGas }
+      )
+      contract.once('CreateCampaign', () => {
+        resolve({ success: true })
+      })
+    })
+  }
+
+  // 获取活动合约的地址
+  const getCampaignAddress = async ({ contract }) => {
+    const signerAddress = await signer.getAddress()
+    const campaignList = await contract.getCampaignAddressList(signerAddress)
+    const campaignAddress = await contract.getCampaignAddress(signerAddress, campaignList.length)
+    return campaignAddress
+  }
+
+  // 创建链上合约
+  const onCreate = async (values) => {
+    try {
+      if (ENV === 'test') {
+        // 链上所需参数
+        const cpaBonusBudget = ethers.utils.parseUnits(values.cpaTaskRewardBudget.toString(), 6)
+        const taskBonusBudget = ethers.utils.parseUnits(values.actionTaskRewardBudget.toString(), 6)
+        const cpaTokenAddress =
+          values.cpaTaskReward.rewardName === 'usdt' ? USDT_TOKEN_ADDRESS : USDC_TOKEN_ADDRESS
+        const taskTokenAddress =
+          values.actionTaskReward.rewardName === 'usdt' ? USDT_TOKEN_ADDRESS : USDC_TOKEN_ADDRESS
+
+        // 链上对象
+        const contract = new ethers.Contract(AD3HUB_ADDRESS, Ad3HubAbi, signer)
+        const cpaToken = new ethers.Contract(
+          cpaTokenAddress,
+          [
+            'function approve(address spender, uint256 amount) external returns (bool)',
+            'event Approval(address indexed owner, address indexed spender, uint256 value)'
+          ],
+          signer
+        )
+        const taskToken = new ethers.Contract(
+          taskTokenAddress,
+          [
+            'function approve(address spender, uint256 amount) external returns (bool)',
+            'event Approval(address indexed owner, address indexed spender, uint256 value)'
+          ],
+          signer
+        )
+        // 开始链上通信
+        await tokenApprove({
+          cpaToken,
+          cpaBonusBudget,
+          taskToken,
+          taskBonusBudget
+        })
+        await createCampaign({
+          contract,
+          cpaBonusBudget,
+          taskBonusBudget,
+          cpaPaymentToken: cpaTokenAddress,
+          taskPaymentToken: taskTokenAddress
+        })
+        return await getCampaignAddress({ contract })
+      }
+    } catch (error) {
+      console.warn(error)
+    }
+  }
+
+  const onPayOnChain = useCallback(() => {
+    if (signer) {
+      if (ENV === 'test' && chain.id === 80001) {
+        onCreate({
+          actionTaskReward: {
+            rewardName: 'usdt',
+            chainNetwork: 'mainnet'
+          },
+          actionTaskRewardBudget: 10,
+          cpaTaskReward: {
+            rewardName: 'usdt',
+            chainNetwork: 'mainnet'
+          },
+          cpaTaskRewardBudget: 10
+        })
+      } else {
+        switchNetwork(80001)
+      }
+    }
+  }, [signer, chain])
+
+  // 提交表单
   const onSubmit = async (values) => {
+    const campaignAddress = await onPayOnChain()
     const params = {
       accountAddress: address,
+      campaignAddress: campaignAddress,
       title: values.title,
       desc: values.desc.toHTML(),
       activityImg: values.activityImg,
@@ -201,8 +358,8 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
                   required={[{ required: true, message: '链上环境不能为空' }]}
                 >
                   <Select style={{ width: 140 }}>
-                    <Select.Option key="Ethereum" value="Ethereum">
-                      Ethereum
+                    <Select.Option key="Polygon" value="137">
+                      Polygon
                     </Select.Option>
                   </Select>
                 </Form.Item>
@@ -268,8 +425,8 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
                   required={[{ required: true, message: '链上环境不能为空' }]}
                 >
                   <Select style={{ width: 140 }}>
-                    <Select.Option key="Ethereum" value="Ethereum">
-                      Ethereum
+                    <Select.Option key="Polygon" value="137">
+                      Polygon
                     </Select.Option>
                   </Select>
                 </Form.Item>
@@ -414,13 +571,14 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
             ]}
             dataSource={taskList}
           />
-          <Form.Item>
+          <Form.Item style={{ marginTop: '16px' }}>
             <Button style={{ marginRight: '16px' }} onClick={() => setCurrent((v) => 0)}>
               返回上一步
             </Button>
             <Button type="primary" htmlType="submit">
               保存并提交
             </Button>
+            <Button onClick={onPayOnChain}>测试链上支付</Button>
           </Form.Item>
           <TaskItemDrawer
             open={drawerVisible}
