@@ -1,3 +1,7 @@
+export const ALCHEMY_POLYGON_AD3_KEY =
+  'https://polygon-mainnet.g.alchemy.com/v2/5aSHl7b-uw8NS_voiPDrdHDp5s7LEJhF'
+export const ALCHEMY_MAINNET_AD3_KEY =
+  'https://eth-mainnet.g.alchemy.com/v2/dyCEPWX_mo0xyKvBoURmAm4jZHV9dUWf'
 export const API_PREFIX = location.origin
 export const PRO_API_PREFIX = 'https://www.adventure3.tk'
 export const TASK_TYPE = [
