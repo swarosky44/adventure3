@@ -55,13 +55,77 @@
 
 
 .main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 138px;
+  padding-left: 30px;
+  padding-right: 30px;
+
   .userInfo {
-    color: red;
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 30px;
+      display: flex;
+      align-items: center;
+      color: #000000;
+    }
 
     .avatar {
       width: 81px;
       height: 81px;
       border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      max-width: 300px;
+      text-align: left;
+      margin-top: 20px;
+    }
+  }
+
+  .tableWrapper {
+    margin-top: 30px;
+    .categoryWrapper {
+      display: flex;
+      margin-top: 20px;
+      margin-bottom: 20px;
+
+      .categoryTitle {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 24px;
+        color: #000000;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      .category {
+        width: 96px;
+        height: 39px;
+        border-radius: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 20px;
+        background: #D1D1D2;
+        color: #000000;
+      }
+
+      .active {
+        background: #3C98EE;
+        color: #fff;
+
+      }
     }
   }
 }
