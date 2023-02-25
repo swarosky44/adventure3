@@ -9,8 +9,8 @@ import { Button, Modal, Input, Form, notification, Space, Table, Tag } from 'ant
 import { DataType, TableParams } from './interface.ts';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
-import qs from 'qs';
-import {ONE,TWO,THREE} from './const.ts';
+import { ONE, TWO, THREE, TaskFeeStatusVal } from './const.ts';
+import { request } from '../../utils/request';
 
 
 const Profile = () => {
@@ -21,7 +21,7 @@ const Profile = () => {
   const [inputValue, SetInputValue] = useState('');
   const [api, contextHolder] = notification.useNotification();
   // table
-  const [activeKey,setActiveKey] = useState(ONE);
+  const [activeKey, setActiveKey] = useState(ONE);
   const [data, setData] = useState<DataType[]>();
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
@@ -61,66 +61,142 @@ const Profile = () => {
   const columns: ColumnsType<DataType> = [
     {
       title: 'Task Name',
-      dataIndex: 'name',
-      render: (name) => `${name.first} ${name.last}`,
+      dataIndex: 'projectTaskDTO.title',
       width: '20%',
+      render: (_, record) => (
+        <Space size="middle">{record.projectTaskDTO.title}</Space>
+      ),
     },
     {
       title: 'Token',
-      dataIndex: 'gender',
-      width: '20%',
+      colSpan: 2,
+      children: [
+        {
+          title: 'cpa token',
+          dataIndex: 'cpaTaskRewardUnit',
+          render: (_, record) => (
+            <Space size="middle">{record.projectTaskDTO.cpaTaskRewardUnit}</Space>
+          ),
+        },
+        {
+          title: 'task token',
+          dataIndex: 'actionTaskRewardUnit',
+          render: (_, record) => (
+            <Space size="middle">{record.projectTaskDTO.actionTaskRewardUnit}</Space>
+          ),
+        },
+      ]
     },
     {
       title: 'Amount',
-      dataIndex: 'email',
+      colSpan: 2,
+      children: [
+        {
+          title: 'cpa amount',
+          dataIndex: 'cpaTaskFeeAmount ',
+          render: (_, record) => (
+            <Space size="middle">{record.cpaTaskFeeAmount}</Space>
+          ),
+        },
+        {
+          title: 'task amount',
+          dataIndex: 'actionTaskFeeAmount',
+          render: (_, record) => (
+            <Space size="middle">{record.actionTaskFeeAmount}</Space>
+          ),
+        },
+      ]
     },
     {
       title: '已提现',
-      dataIndex: 'email',
+      colSpan: 2,
+      children: [
+        {
+          title: 'cpa amount',
+          dataIndex: 'cpaTaskRewardBudget',
+          render: (_, record) => (
+            <Space size="middle">{record.projectTaskDTO.cpaTaskRewardBudget}</Space>
+          ),
+        },
+        {
+          title: 'task amount',
+          dataIndex: 'actionTaskRewardBudget',
+          render: (_, record) => (
+            <Space size="middle">{record.projectTaskDTO.actionTaskRewardBudget}</Space>
+          ),
+        },
+      ]
     },
     {
       title: '可提取',
-      dataIndex: 'email',
+      colSpan: 2,
+      children: [
+        {
+          title: 'cpa',
+          dataIndex: 'cpaTaskFeeStatus',
+          render: (_, record) => (
+            <Space size="middle">{TaskFeeStatusVal[record.cpaTaskFeeStatus]}</Space>
+          ),
+        },
+        {
+          title: 'task',
+          dataIndex: 'actionTaskFeeStatus',
+          render: (_, record) => (
+            <Space size="middle">{TaskFeeStatusVal[record.actionTaskFeeStatus]}</Space>
+          ),
+        },
+      ]
     },
     {
       title: '截止有效期',
-      dataIndex: 'registered.date',
+      dataIndex: 'launchEndTime',
+      render: (_, record) => (
+        <Space size="middle">{record.projectTaskDTO.launchEndTime}</Space>
+      ),
     },
     {
       title: '操作',
-      dataIndex: 'email',
-      render: (_, record) => (
-        <Space size="middle">
-          <a>提现</a>
-        </Space>
-      ),
+      colSpan: 2,
+      children: [
+        {
+          title: 'cpa action',
+          render: (_, record) => (
+            <Space size="middle"><a>分享任务提现</a></Space>
+          ),
+        },
+        {
+          title: 'task amount',
+          render: (_, record) => (
+            <Space size="middle"><a>行为任务提现</a></Space>
+          ),
+        },
+      ]
     },
   ];
 
-  const getRandomuserParams = (params: TableParams) => ({
-    results: params.pagination?.pageSize,
-    page: params.pagination?.current,
-    ...params,
-  });
 
-  const fetchData = () => {
+  const fetchData = async () => {
     setLoading(true);
-    fetch(`https://randomuser.me/api?${qs.stringify(getRandomuserParams(tableParams))}`)
-      .then((res) => res.json())
-      .then(({ results }) => {
-        console.log("results", results);
-        setData(results);
-        setLoading(false);
-        setTableParams({
-          ...tableParams,
-          pagination: {
-            ...tableParams.pagination,
-            total: 200,
-            // 200 is mock data, you should read it from server
-            // total: data.totalCount,
-          },
-        });
+    const ret = await request({
+      api: 'api/taskInstance/queryProjectTaskResult',
+      params: {
+        address,
+        projectTaskId: 41,
+        pageSize: tableParams.pagination.pageSize,
+        pageNum: tableParams.pagination.current
+      }
+    })
+    if (ret.code === 0 && ret.result) {
+      setData(ret.result.list);
+      setLoading(false);
+      setTableParams({
+        ...tableParams,
+        pagination: {
+          ...tableParams.pagination,
+          total: ret.result.total,
+        },
       });
+    }
   };
 
   useEffect(() => {
@@ -174,18 +250,19 @@ const Profile = () => {
         </div>
         <div className={styles.tableWrapper}>
           <div className={styles.categoryTitle}>任务收益明细</div>
-          <div className={styles.categoryWrapper}>
-            <div onClick={()=>categoryClick(ONE)} className={activeKey ===ONE ? categoryClassArr.join(' ') : styles.category}>ALL</div>
-            <div onClick={()=>categoryClick(TWO)} className={activeKey ===TWO ? categoryClassArr.join(' ') : styles.category}>积分任务</div>
-            <div onClick={()=>categoryClick(THREE)} className={activeKey ===THREE ? categoryClassArr.join(' ') : styles.category}>分享任务</div>
-          </div>
+          {/* <div className={styles.categoryWrapper}>
+            <div onClick={() => categoryClick(ONE)} className={activeKey === ONE ? categoryClassArr.join(' ') : styles.category}>ALL</div>
+            <div onClick={() => categoryClick(TWO)} className={activeKey === TWO ? categoryClassArr.join(' ') : styles.category}>积分任务</div>
+            <div onClick={() => categoryClick(THREE)} className={activeKey === THREE ? categoryClassArr.join(' ') : styles.category}>分享任务</div>
+          </div> */}
           <Table
             columns={columns}
-            rowKey={(record) => record.login.uuid}
+            rowKey={(record) => record.id}
             dataSource={data}
             pagination={tableParams.pagination}
             loading={loading}
             onChange={handleTableChange}
+            bordered={true}
           />
         </div>
       </main>

@@ -14,6 +14,7 @@ import DescPannel from './components/DescPannel'
 import RewardPannel from './components/RewardPannel'
 import styles from './index.module.less'
 
+
 const Detail = () => {
   const [loading, setLoading] = useState(true)
   const [actionTaskInstance, setActionTaskInstance] = useState(null)
