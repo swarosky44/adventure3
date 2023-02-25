@@ -3,23 +3,20 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useNavigate } from 'react-router-dom'
 import styles from './index.module.less';
 import { isMobile } from 'react-device-detect';
-import { PlusOutlined, UserOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { useAccount } from 'wagmi';
-import { Button, Modal, Input, Form, notification, Space, Table, Tag } from 'antd';
+import { Space, Table } from 'antd';
 import { DataType, TableParams } from './interface.ts';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { ONE, TWO, THREE, TaskFeeStatusVal } from './const.ts';
 import { request } from '../../utils/request';
+import SocialBox from './components/socialBox/index.tsx';
 
 
 const Profile = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { address } = useAccount();
   const navigate = useNavigate();
-  const formRef = React.useRef(null);
-  const [inputValue, SetInputValue] = useState('');
-  const [api, contextHolder] = notification.useNotification();
   // table
   const [activeKey, setActiveKey] = useState(ONE);
   const [data, setData] = useState<DataType[]>();
@@ -31,32 +28,7 @@ const Profile = () => {
     },
   });
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
 
-  const openNotificationWithIcon = (type) => {
-    api[type]({
-      message: 'Error',
-      description:
-        'Please enter the value to the form.',
-    });
-  };
-
-
-  const handleOk = () => {
-    const value = formRef?.current?.getFieldValue('username');
-    if (value) {
-      SetInputValue(value);
-      setIsModalOpen(false);
-    } else {
-      openNotificationWithIcon('error');
-    }
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
 
   const columns: ColumnsType<DataType> = [
     {
@@ -245,8 +217,7 @@ const Profile = () => {
           <div className={styles.title}>Account</div>
           <img className={styles.avatar} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
           {address && <div className={styles.walletAddress}>{address}</div>}
-          {contextHolder}
-          <Button className={`${styles.btn} ${styles.userNameBtn}`} icon={<UserOutlined />} onClick={showModal}>{inputValue ? inputValue : 'Pleae Enter your name'}<EditOutlined /></Button>
+          <SocialBox />
         </div>
         <div className={styles.tableWrapper}>
           <div className={styles.categoryTitle}>任务收益明细</div>
@@ -266,19 +237,7 @@ const Profile = () => {
           />
         </div>
       </main>
-      <Modal title="Please enter your name" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <Form
-          name="basic"
-          ref={formRef}
-        >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Please input your username!' }]}
-          >
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
+
     </div>
   )
 }
