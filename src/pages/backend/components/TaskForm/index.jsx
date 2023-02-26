@@ -249,7 +249,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
           })
           onSubmit(values, result)
         } else {
-          switchNetwork(137)
+          switchNetwork(1337)
         }
       }
     },

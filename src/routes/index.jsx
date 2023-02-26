@@ -8,6 +8,7 @@ const Backend = loadable(() => import('@/pages/backend'))
 const BackendList = loadable(() => import('@/pages/backendList'))
 const BackendDetail = loadable(() => import('@/pages/backendDetail'))
 const EncryptoCampaign = loadable(() => import('@/pages/encrypto/campaign'))
+const Profile = loadable(() => import('@/pages/profile'))
 
 const routesConfig = createBrowserRouter([
   {
@@ -40,6 +41,11 @@ const routesConfig = createBrowserRouter([
   {
     path: '/encrypto',
     element: <EncryptoCampaign />
+  },
+  {
+    //  create a route /profile
+    path: '/profile',
+    element: <Profile />
   }
 ])
 

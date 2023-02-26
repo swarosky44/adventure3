@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import styles from './index.module.less'
 
 const BasicLayout = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className={styles.page}>

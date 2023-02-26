@@ -1,0 +1,122 @@
+.page {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100vw;
+  height: 88px;
+  padding: 4px 200px;
+  background-color: #fff;
+  border-bottom: 1px solid #f4f4f4;
+  box-sizing: border-box;
+  z-index: 99;
+}
+
+.logo {
+  height: 64px;
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.create {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 176px;
+  height: 36px;
+  margin-left: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: Poppins-Bold;
+  color: #fff;
+  background-color: #3d7ef6;
+}
+
+.main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 138px;
+  padding-left: 30px;
+  padding-right: 30px;
+
+  .userInfo {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 30px;
+      display: flex;
+      align-items: center;
+      color: #000000;
+    }
+
+    .avatar {
+      width: 81px;
+      height: 81px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+  }
+
+  .tableWrapper {
+    margin-top: 30px;
+    .categoryWrapper {
+      display: flex;
+      margin-top: 20px;
+
+      .categoryTitle {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 24px;
+        color: #000000;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .category {
+        width: 96px;
+        height: 39px;
+        border-radius: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 20px;
+        background: #d1d1d2;
+        color: #000000;
+      }
+
+      .active {
+        background: #3c98ee;
+        color: #fff;
+      }
+    }
+  }
+}
