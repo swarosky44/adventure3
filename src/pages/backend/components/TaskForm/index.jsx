@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   Form,
   Input,
@@ -32,6 +32,7 @@ import {
 import Ad3HubAbi from '@/utils/Ad3Hub.json'
 import styles from './index.module.less'
 
+let tempTaskList = []
 const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const [drawerVisible, setDrawerVisible] = useState(false)
   const [taskList, setTaskList] = useState([])
@@ -89,65 +90,6 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
     return true
   }
 
-  // 申请货币额度
-  const tokenApprove = async ({ cpaToken, cpaBonusBudget, taskToken, taskBonusBudget }) => {
-    const feeData = await getCurrentGasPrice()
-    const gasParams = {
-      maxFeePerGas: feeData.maxFeePerGas,
-      maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
-    }
-    const approveCpaToken = () => {
-      return new Promise((resolve) => {
-        cpaToken.approve(
-          AD3HUB_ADDRESS,
-          cpaBonusBudget.toNumber() + taskBonusBudget.toNumber(),
-          gasParams
-        )
-        cpaToken.once('Approval', () => {
-          resolve({ success: true, type: 'cpaToken' })
-        })
-      })
-    }
-    const approveTaskToken = () => {
-      return new Promise((resolve) => {
-        taskToken.approve(
-          AD3HUB_ADDRESS,
-          cpaBonusBudget.toNumber() + taskBonusBudget.toNumber(),
-          gasParams
-        )
-        taskToken.once('Approval', () => {
-          resolve({ success: true, type: 'taskToken' })
-        })
-      })
-    }
-    await approveCpaToken()
-    await approveTaskToken()
-    return Promise.resolve({})
-  }
-
-  // 创建活动合约实例
-  const createCampaign = async ({
-    contract,
-    cpaBonusBudget,
-    taskBonusBudget,
-    cpaPaymentToken,
-    taskPaymentToken
-  }) => {
-    const feeData = await getCurrentGasPrice()
-    await contract.createCampaign(
-      cpaBonusBudget,
-      taskBonusBudget,
-      cpaPaymentToken,
-      taskPaymentToken,
-      { maxFeePerGas: feeData.maxFeePerGas, maxPriorityFeePerGas: feeData.maxPriorityFeePerGas }
-    )
-    return new Promise((resolve) => {
-      contract.once('CreateCampaign', () => {
-        resolve({ success: true })
-      })
-    })
-  }
-
   // 获取活动合约的地址
   const getCampaignAddress = async ({ contract }) => {
     const signerAddress = await signer.getAddress()
@@ -160,97 +102,95 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const onCreate = async (values) => {
     try {
       // 链上对象 & 参数
-      const cpaTokenAddress =
-        values.cpaTaskReward.rewardName === 'usdt' ? USDT_TOKEN_ADDRESS : USDC_TOKEN_ADDRESS
-      const taskTokenAddress =
+      const tokenAddress =
         values.actionTaskReward.rewardName === 'usdt' ? USDT_TOKEN_ADDRESS : USDC_TOKEN_ADDRESS
       const contract = new ethers.Contract(AD3HUB_ADDRESS, Ad3HubAbi, signer)
-      const cpaToken = new ethers.Contract(
-        cpaTokenAddress,
+      const token = new ethers.Contract(
+        tokenAddress,
         [
           'function approve(address spender, uint256 amount) external returns (bool)',
-          'event Approval(address indexed owner, address indexed spender, uint256 value)'
-        ],
-        signer
-      )
-      const taskToken = new ethers.Contract(
-        taskTokenAddress,
-        [
-          'function approve(address spender, uint256 amount) external returns (bool)',
+          'function balanceOf(address account) view returns (uint256)',
           'event Approval(address indexed owner, address indexed spender, uint256 value)'
         ],
         signer
       )
 
       const ratio = await contract.getRatio()
-      const cpaBonusBudget = ethers.utils.parseUnits(
-        (values.cpaTaskRewardBudget * (1 + ratio.toNumber() / 100)).toString(),
-        6
-      )
-      const taskBonusBudget = ethers.utils.parseUnits(
-        (values.actionTaskRewardBudget * (1 + ratio.toNumber() / 100)).toString(),
-        6
-      )
+      const cpaBonusBudget = ethers.utils
+        .parseUnits(
+          (values.cpaTaskReward.rewardBudget * (1 + ratio.toNumber() / 100)).toString(),
+          6
+        )
+        .toNumber()
+      const taskBonusBudget = ethers.utils
+        .parseUnits(
+          (values.actionTaskReward.rewardBudget * (1 + ratio.toNumber() / 100)).toString(),
+          6
+        )
+        .toNumber()
+      const feeData = await getCurrentGasPrice()
+      const gasParams = {
+        maxFeePerGas: feeData.maxFeePerGas,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+      }
 
       // 开始链上通信
-      await tokenApprove({
-        contract,
-        cpaToken,
-        cpaBonusBudget,
-        taskToken,
-        taskBonusBudget
+      // 申请额度
+      await token.approve(AD3HUB_ADDRESS, (cpaBonusBudget + taskBonusBudget) * 10, gasParams)
+      await (() =>
+        new Promise((resolve) => {
+          token.once('Approval', async () => {
+            resolve()
+          })
+        }))()
+      // 创建链上活动合约
+      await contract.createCampaign(cpaBonusBudget, taskBonusBudget, tokenAddress, tokenAddress, {
+        maxFeePerGas: feeData.maxFeePerGas,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
       })
-      await createCampaign({
-        contract,
-        cpaBonusBudget,
-        taskBonusBudget,
-        cpaPaymentToken: cpaTokenAddress,
-        taskPaymentToken: taskTokenAddress
-      })
+      await (() =>
+        new Promise((resolve) => {
+          contract.once('CreateCampaign', () => {
+            resolve()
+          })
+        }))()
       const address = await getCampaignAddress({ contract })
       return address
     } catch (error) {
       console.warn(error)
+      message.warning('链上支付失败，请查看钱包活动内的具体原因')
       return ''
     }
   }
 
   const onPayOnChain = useCallback(
     async (values) => {
+      if (ENV === 'test' && chain.id !== 80001) {
+        switchNetwork(80001)
+        return
+      }
+      if (ENV === 'daily' && chain.id !== 1337) {
+        switchNetwork(1337)
+        return
+      }
+      if (ENV === 'prod' && chain.id !== Number(values.actionTaskReward.chainNetwork)) {
+        switchNetwork(Number(values.actionTaskReward.chainNetwork))
+        return
+      }
       if (signer && !loading) {
         setLoading(true)
 
-        if (ENV === 'test' && chain.id === 80001) {
-          const result = await onCreate({
-            actionTaskReward: {
-              rewardName: 'usdt',
-              chainNetwork: 'polygon'
-            },
-            actionTaskRewardBudget: 10,
-            cpaTaskReward: {
-              rewardName: 'usdt',
-              chainNetwork: 'polygon'
-            },
-            cpaTaskRewardBudget: 10
-          })
-          onSubmit(values, result)
-        } else if (ENV === 'daily' && chain.id === 1337) {
-          const result = await onCreate({
-            actionTaskReward: {
-              rewardName: 'usdt',
-              chainNetwork: 'polygon'
-            },
-            actionTaskRewardBudget: 10,
-            cpaTaskReward: {
-              rewardName: 'usdt',
-              chainNetwork: 'polygon'
-            },
-            cpaTaskRewardBudget: 10
-          })
-          onSubmit(values, result)
-        } else {
-          switchNetwork(1337)
-        }
+        const result = await onCreate({
+          actionTaskReward: {
+            rewardName: values.actionTaskReward.rewardName,
+            rewardBudget: values.actionTaskRewardBudget
+          },
+          cpaTaskReward: {
+            rewardName: values.actionTaskReward.rewardName,
+            rewardBudget: values.cpaTaskRewardBudget
+          }
+        })
+        onSubmit(values, result)
       }
     },
     [signer, loading, chain]
@@ -258,6 +198,10 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
 
   // 提交表单
   const onSubmit = async (values, campaignAddress) => {
+    if (!campaignAddress) {
+      setLoading(false)
+      return
+    }
     const params = {
       accountAddress: address,
       campaignAddress: campaignAddress,
@@ -272,10 +216,10 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       actionTaskRewardNum: values.actionTaskRewardBudget / values.actionTaskRewardNum,
       actionTaskRewardBudget: values.actionTaskRewardBudget,
       actionTaskDrawTime: values.actionTaskDrawTime.format(),
-      actionTaskDTOS: taskList,
+      actionTaskDTOS: tempTaskList,
       isCpaTask: true,
-      cpaTaskRewardUnit: values.cpaTaskReward.rewardName,
-      cpaTaskRewardChainNetwork: values.cpaTaskReward.chainNetwork,
+      cpaTaskRewardUnit: values.actionTaskReward.rewardName,
+      cpaTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
       cpaTaskRewardBudget: values.cpaTaskRewardBudget,
       cpaTaskBiddingType: values.cpaTaskBiddingType,
       cpaTaskPerPrice: values.cpaTaskPerPrice,
@@ -290,8 +234,15 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       setCurrent(2)
       setTaskResult(ret)
       setLoading(false)
+    } else {
+      message.warning('网络异常，请稍后重试 ~')
+      setLoading(false)
     }
   }
+
+  useEffect(() => {
+    tempTaskList = taskList
+  }, [taskList])
 
   return (
     <div className={styles.comp}>
@@ -405,9 +356,6 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
                     <Select.Option key="usdt" value="usdt">
                       USDT
                     </Select.Option>
-                    <Select.Option key="usdc" value="usdc">
-                      USDC
-                    </Select.Option>
                   </Select>
                 </Form.Item>
               </Input.Group>
@@ -450,35 +398,6 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
 
           <div>
             <Divider>CPA 任务配置</Divider>
-            <Form.Item name="cpaTaskReward" label="奖励币种" required hasFeedback>
-              <Input.Group compact>
-                <Form.Item
-                  name={['cpaTaskReward', 'chainNetwork']}
-                  noStyle
-                  required={[{ required: true, message: '链上环境不能为空' }]}
-                >
-                  <Select style={{ width: 140 }}>
-                    <Select.Option key="Polygon" value="137">
-                      Polygon
-                    </Select.Option>
-                  </Select>
-                </Form.Item>
-                <Form.Item
-                  name={['cpaTaskReward', 'rewardName']}
-                  noStyle
-                  required={[{ required: true, message: '奖励币种不能为空' }]}
-                >
-                  <Select style={{ width: 220 }}>
-                    <Select.Option key="usdt" value="usdt">
-                      USDT
-                    </Select.Option>
-                    <Select.Option key="usdc" value="usdc">
-                      USDC
-                    </Select.Option>
-                  </Select>
-                </Form.Item>
-              </Input.Group>
-            </Form.Item>
             <Form.Item
               name="cpaTaskRewardBudget"
               label="奖励预算"
