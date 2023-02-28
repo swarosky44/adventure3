@@ -3,9 +3,9 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import Particles from 'react-particles'
 import { loadFull } from 'tsparticles'
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons'
 import { isMobile } from 'react-device-detect'
-import { useAccount } from 'wagmi';
+import { useAccount } from 'wagmi'
 import { Result, Spin } from 'antd'
 import Das from 'das-sdk'
 import { request } from '@/utils/request'
@@ -14,7 +14,6 @@ import BasicPannel from './components/BasicPannel'
 import DescPannel from './components/DescPannel'
 import RewardPannel from './components/RewardPannel'
 import styles from './index.module.less'
-
 
 const Detail = () => {
   const [owner, setOwner] = useState(null)
@@ -61,18 +60,11 @@ const Detail = () => {
       }
     })
     if (ret && ret.result && ret.result.projectTaskDTO) {
-      const {
-        actionTaskInstances,
-        actionTaskStatus,
-        cpaTaskInstance,
-        // cpaTaskStatus,
-        projectTaskDTO
-      } = ret.result
+      const { actionTaskInstances, actionTaskStatus, cpaTaskInstance, projectTaskDTO } = ret.result
 
       setActionTaskInstance(actionTaskInstances)
       setActionTaskStatus(actionTaskStatus)
       setCpaTaskInstance(cpaTaskInstance)
-      // setCpaTaskStatus(cpaTaskStatus)
       setProjectTaskDTO(projectTaskDTO)
     }
     setLoading(false)

@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit'
 import { useNavigate } from 'react-router-dom'
 import { isMobile } from 'react-device-detect'
 import { PlusOutlined } from '@ant-design/icons'
 import { useAccount, useSigner } from 'wagmi'
-import { Space, Table } from 'antd'
+import { Space, Table, Result, message } from 'antd'
 import { ethers } from 'ethers'
+import dayjs from 'dayjs'
 import CampaignAbi from '@/utils/Campaign.json'
-import { TaskFeeStatusVal, MOCK } from './const.js'
-import { request, getCurrentGasPrice } from '../../utils/request'
+import { request, getCurrentGasPrice } from '@/utils/request'
 import styles from './index.module.less'
 
 const Profile = () => {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const { data: signer } = useSigner()
   const navigate = useNavigate()
   const [data, setData] = useState()
@@ -23,48 +23,85 @@ const Profile = () => {
       pageSize: 10
     }
   })
+  const { openConnectModal } = useConnectModal()
+
+  // 更新支付状态
+  const updatePayFeeStatus = async ({ address, projectTaskId, type, status }) => {
+    await request({
+      api: 'api/taskInstance/updatePayFeeStatus',
+      params: {
+        address,
+        projectTaskId,
+        type,
+        status
+      }
+    })
+  }
 
   // 提款
   const onWithdraw = async (data, type) => {
-    // 准备链上参数 & 对象
-    const { projectTaskDTO, cpaTaskFeeAmount, actionTaskFeeAmount } = data
-    const {
-      campaignAddress,
-      cpaTaskFeeKeyR,
-      cpaTaskFeeKeyS,
-      cpaTaskFeeKeyV,
-      actionTaskFeeKeyR,
-      actionTaskFeeKeyS,
-      actionTaskFeeKeyV
-    } = projectTaskDTO
+    try {
+      // 准备链上参数 & 对象
+      const {
+        actionTaskFeeAmount,
+        actionTaskFeeKeyR,
+        actionTaskFeeKeyS,
+        actionTaskFeeKeyV,
+        cpaTaskFeeAmount,
+        cpaTaskFeeKeyR,
+        cpaTaskFeeKeyS,
+        cpaTaskFeeKeyV,
+        projectTaskDTO
+      } = data
+      const { projectTaskId } = projectTaskDTO
+      const actionFee = ethers.utils.parseUnits(actionTaskFeeAmount.toString(), 6).toNumber()
+      const cpaFee = ethers.utils.parseUnits(cpaTaskFeeAmount.toString(), 6).toNumber()
+      const campaignAddress = '0xa16E02E87b7454126E5E10d957A927A7F5B5d2be'
 
-    const contract = new ethers.Contract(campaignAddress, CampaignAbi, signer)
-    const feeData = await getCurrentGasPrice()
-    const gasParams = {
-      maxFeePerGas: feeData.maxFeePerGas,
-      maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
-    }
-    if (type === 'cpa') {
-      // 分享任务奖励
-      const signature = `${cpaTaskFeeKeyR}${cpaTaskFeeKeyS.slice(2, cpaTaskFeeKeyS.length)}${Number(
-        cpaTaskFeeKeyV
-      ).toString(16)}`
-      await contract.claimCpaReward(Number(cpaTaskFeeAmount), signature, gasParams)
-      contract.once('ClaimCpaReward', () => {
-        console.info('ClaimCpaReward Success')
-        // TODO => 通知服务端领取成功
-      })
-    } else if (type === 'task') {
-      // 行为任务奖励
-      const signature = `${actionTaskFeeKeyR}${actionTaskFeeKeyS.slice(
-        2,
-        actionTaskFeeKeyV.length
-      )}${Number(actionTaskFeeKeyV).toString(16)}`
-      await contract.claimTaskReward(Number(actionTaskFeeAmount), signature, gasParams)
-      contract.once('ClaimTaskReward', () => {
-        console.info('ClaimTaskReward Success')
-        // TODO => 通知服务端领取成功
-      })
+      const contract = new ethers.Contract(campaignAddress, CampaignAbi, signer)
+      const feeData = await getCurrentGasPrice()
+      const gasParams = {
+        maxFeePerGas: feeData.maxFeePerGas,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+      }
+
+      if (type === 'cpa') {
+        // 分享任务奖励
+        const signature = `${cpaTaskFeeKeyR}${cpaTaskFeeKeyS.slice(
+          2,
+          cpaTaskFeeKeyS.length
+        )}${Number(cpaTaskFeeKeyV).toString(16)}`
+        if (signature !== '0') {
+          await contract.claimCpaReward(cpaFee, signature, gasParams)
+          contract.once('ClaimCpaReward', async () => {
+            await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })
+          })
+        } else {
+          throw new Error('AD3Hub: PrizeSignature invalid.')
+        }
+      } else if (type === 'task') {
+        // 行为任务奖励
+        const signature = `${actionTaskFeeKeyR}${actionTaskFeeKeyS.slice(
+          2,
+          actionTaskFeeKeyV.length
+        )}${Number(actionTaskFeeKeyV).toString(16)}`
+        if (signature !== '0') {
+          await contract.claimTaskReward(actionFee, signature, gasParams)
+          contract.once('ClaimTaskReward', async () => {
+            await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })
+          })
+        } else {
+          throw new Error('AD3Hub: PrizeSignature invalid.')
+        }
+      }
+    } catch (error) {
+      if (error.message.indexOf('PrizeSignature invalid') >= 0) {
+        message.warning('AD3Hub: PrizeSignature invalid.')
+      } else if (error.message.indexOf('AD3Hub: Repeated claim reward.') >= 0) {
+        message.warning('AD3Hub: Repeated claim reward.')
+      } else {
+        message.warning(error.message)
+      }
     }
   }
 
@@ -96,23 +133,7 @@ const Profile = () => {
       ]
     },
     {
-      title: 'Amount',
-      colSpan: 2,
-      children: [
-        {
-          title: 'cpa amount',
-          dataIndex: 'cpaTaskFeeAmount ',
-          render: (_, record) => <Space size="middle">{record.cpaTaskFeeAmount}</Space>
-        },
-        {
-          title: 'task amount',
-          dataIndex: 'actionTaskFeeAmount',
-          render: (_, record) => <Space size="middle">{record.actionTaskFeeAmount}</Space>
-        }
-      ]
-    },
-    {
-      title: '已提现',
+      title: 'Budget',
       colSpan: 2,
       children: [
         {
@@ -132,47 +153,71 @@ const Profile = () => {
       ]
     },
     {
-      title: '可提取',
+      title: 'Amount',
       colSpan: 2,
       children: [
         {
-          title: 'cpa',
-          dataIndex: 'cpaTaskFeeStatus',
-          render: (_, record) => (
-            <Space size="middle">{TaskFeeStatusVal[record.cpaTaskFeeStatus]}</Space>
-          )
+          title: 'cpa amount',
+          dataIndex: 'cpaTaskFeeAmount ',
+          render: (_, record) => <Space size="middle">{record.cpaTaskFeeAmount}</Space>
         },
         {
-          title: 'task',
-          dataIndex: 'actionTaskFeeStatus',
-          render: (_, record) => (
-            <Space size="middle">{TaskFeeStatusVal[record.actionTaskFeeStatus]}</Space>
-          )
+          title: 'task amount',
+          dataIndex: 'actionTaskFeeAmount',
+          render: (_, record) => <Space size="middle">{record.actionTaskFeeAmount}</Space>
         }
       ]
     },
+    // {
+    //   title: '已提现',
+    //   colSpan: 2,
+    //   children: [
+    //     {
+    //       title: 'cpa amount',
+    //       dataIndex: 'cpaTaskRewardBudget',
+    //       render: (_, record) => (
+    //         <Space size="middle">{record.projectTaskDTO.cpaTaskRewardBudget}</Space>
+    //       )
+    //     },
+    //     {
+    //       title: 'task amount',
+    //       dataIndex: 'actionTaskRewardBudget',
+    //       render: (_, record) => (
+    //         <Space size="middle">{record.projectTaskDTO.actionTaskRewardBudget}</Space>
+    //       )
+    //     }
+    //   ]
+    // },
     {
-      title: '截止有效期',
+      title: 'EndTime',
       dataIndex: 'launchEndTime',
-      render: (_, record) => <Space size="middle">{record.projectTaskDTO.launchEndTime}</Space>
+      render: (_, record) => (
+        <Space size="middle">
+          {dayjs(record.projectTaskDTO.launchEndTime).format('YYYY-MM-DD HH:mm')}
+        </Space>
+      )
     },
     {
-      title: '操作',
+      title: 'Operation',
       colSpan: 2,
       children: [
         {
           title: 'cpa action',
           render: (_, record) => (
             <Space size="middle">
-              <a onClick={() => onWithdraw(record, 'cpa')}>分享任务提现</a>
+              <a onClick={() => onWithdraw(record, 'cpa')}>
+                {record.cpaTaskFeeAmount > 0 ? 'Withdraw' : '-'}
+              </a>
             </Space>
           )
         },
         {
-          title: 'task amount',
+          title: 'task action',
           render: (_, record) => (
             <Space size="middle">
-              <a onClick={() => onWithdraw(record, 'task')}>行为任务提现</a>
+              <a onClick={() => onWithdraw(record, 'task')}>
+                {record.actionTaskFeeAmount > 0 ? 'Wthdraw' : '-'}
+              </a>
             </Space>
           )
         }
@@ -186,13 +231,12 @@ const Profile = () => {
       api: 'api/taskInstance/queryProjectTaskResult',
       params: {
         address,
-        projectTaskId: 41,
         pageSize: tableParams.pagination.pageSize,
         pageNum: tableParams.pagination.current
       }
     })
     if (ret.code === 0 && ret.result) {
-      setData(ret.result.list && ret.result.list.length ? ret.result.list : MOCK)
+      setData(ret.result.list)
       setLoading(false)
       setTableParams({
         ...tableParams,
@@ -205,8 +249,10 @@ const Profile = () => {
   }
 
   useEffect(() => {
-    fetchData()
-  }, [JSON.stringify(tableParams)])
+    if (signer) {
+      fetchData()
+    }
+  }, [signer])
 
   const handleTableChange = (pagination, filters, sorter) => {
     setTableParams({
@@ -219,6 +265,28 @@ const Profile = () => {
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
       setData([])
     }
+  }
+
+  if (isMobile) {
+    return (
+      <div className={styles.page}>
+        <Result
+          title="Please visit this page from PC"
+          extra={<a href={location.href}>{location.href}</a>}
+        />
+      </div>
+    )
+  }
+
+  if (!isConnected) {
+    return (
+      <div className={styles.page}>
+        <Result
+          title="Please log in to the wallet first"
+          extra={<a onClick={() => openConnectModal()}>Log in</a>}
+        />
+      </div>
+    )
   }
 
   return (
@@ -237,7 +305,7 @@ const Profile = () => {
       </header>
       <main className={styles.main}>
         <div className={styles.tableWrapper}>
-          <div className={styles.categoryTitle}>任务收益明细</div>
+          <div className={styles.categoryTitle}>TASK DETAILS</div>
           <Table
             style={{ marginTop: '16px' }}
             columns={columns}

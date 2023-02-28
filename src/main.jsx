@@ -8,9 +8,31 @@ import routes from '@/routes'
 import '@/styles/global.less'
 import '@rainbow-me/rainbowkit/styles.css'
 
+const index = Math.floor(Math.random() * (100 - 1)) + 1
+const CustomAvatar = ({ address, ensImage, size }) => {
+  return ensImage ? (
+    <img src={ensImage} width={size} height={size} style={{ borderRadius: 999 }} />
+  ) : (
+    <div
+      style={{
+        backgroundColor: 'pink',
+        borderRadius: 999,
+        height: size,
+        width: size
+      }}
+      onClick={() => window.location.assign('https://www.adventure3.tk/profile')}
+    >
+      <img
+        style={{ width: '100%' }}
+        src={`https://db35z3hw6fbxp.cloudfront.net/user-icon${index}.png`}
+      />
+    </div>
+  )
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <WagmiConfig client={client}>
-    <RainbowKitProvider chains={chains}>
+    <RainbowKitProvider chains={chains} avatar={CustomAvatar}>
       <RouterProvider router={routes} />
     </RainbowKitProvider>
   </WagmiConfig>

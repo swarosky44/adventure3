@@ -22,13 +22,7 @@ import zhCN from 'antd/locale/zh_CN'
 import { request, getCurrentGasPrice } from '@/utils/request'
 import QuillEditor from '../quillEditor'
 import TaskItemDrawer from '../TaskItemDrawer'
-import {
-  TASK_TYPE,
-  ENV,
-  AD3HUB_ADDRESS,
-  USDT_TOKEN_ADDRESS,
-  USDC_TOKEN_ADDRESS
-} from '@/utils/const'
+import { TASK_TYPE, ENV, AD3HUB_ADDRESS, USDT_TOKEN_ADDRESS } from '@/utils/const'
 import Ad3HubAbi from '@/utils/Ad3Hub.json'
 import styles from './index.module.less'
 
@@ -102,8 +96,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const onCreate = async (values) => {
     try {
       // 链上对象 & 参数
-      const tokenAddress =
-        values.actionTaskReward.rewardName === 'usdt' ? USDT_TOKEN_ADDRESS : USDC_TOKEN_ADDRESS
+      const tokenAddress = USDT_TOKEN_ADDRESS
       const contract = new ethers.Contract(AD3HUB_ADDRESS, Ad3HubAbi, signer)
       const token = new ethers.Contract(
         tokenAddress,

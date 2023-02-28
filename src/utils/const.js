@@ -4,6 +4,9 @@ export const ALCHEMY_POLYGON_AD3_KEY =
 export const ALCHEMY_MAINNET_AD3_KEY =
   'https://eth-mainnet.g.alchemy.com/v2/dyCEPWX_mo0xyKvBoURmAm4jZHV9dUWf'
 
+export const ALCHEMY_MUMBAI_AD3_KEY =
+  'https://polygon-mumbai.g.alchemy.com/v2/Ko5Mfq83UFafu5lEO_znMcqjoTgRaWJ7'
+
 export const PRO_API_PREFIX = 'https://www.adventure3.tk'
 
 export const API_PREFIX = location.origin
@@ -13,7 +16,7 @@ export const ENV =
     ? 'test'
     : window.location.search.indexOf('env=daily') >= 0
     ? 'daily'
-    : 'prod'
+    : 'test'
 
 export const AD3HUB_ADDRESS =
   ENV === 'test'
@@ -23,13 +26,6 @@ export const AD3HUB_ADDRESS =
     : ''
 
 export const USDT_TOKEN_ADDRESS =
-  ENV === 'test'
-    ? '0xEb3B6d447F0f1bcd47C2Ba907b0b0aE515f67601'
-    : ENV === 'daily'
-    ? '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
-    : ''
-
-export const USDC_TOKEN_ADDRESS =
   ENV === 'test'
     ? '0xEb3B6d447F0f1bcd47C2Ba907b0b0aE515f67601'
     : ENV === 'daily'
