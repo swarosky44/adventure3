@@ -34,6 +34,11 @@ const FormResult = ({ data = null, setCurrent = () => {} }) => {
           </Popover>,
           <Button key="back" onClick={() => setCurrent(0)}>
             重新创建
+          </Button>,
+          <Button key="detail">
+            <a target="_blank" href={`https://www.adventure3.tk/detail?id=${result}`}>
+              查看配置详情
+            </a>
           </Button>
         ]}
       />

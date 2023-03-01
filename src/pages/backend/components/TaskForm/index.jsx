@@ -128,6 +128,13 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       }
 
       // 开始链上通信
+      // 判断用户钱包余额
+      const balance = await token.balanceOf(signer.getAddress())
+      const total = cpaBonusBudget + taskBonusBudget
+      if (balance.toNumber() <= total) {
+        message.warning('您的钱包余额不足以支付本次活动预算')
+        return ''
+      }
       // 申请额度
       await token.approve(AD3HUB_ADDRESS, (cpaBonusBudget + taskBonusBudget) * 10, gasParams)
       await (() =>

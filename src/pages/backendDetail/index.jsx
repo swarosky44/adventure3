@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Card, Descriptions, Spin, Result, Button, Table } from 'antd'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { useAccount } from 'wagmi'
+import { useAccount, useSigner } from 'wagmi'
+import { ethers } from 'ethers'
 import dayjs from 'dayjs'
-import { TASK_TYPE } from '@/utils/const'
+import { TASK_TYPE, USDT_TOKEN_ADDRESS } from '@/utils/const'
 import { request } from '@/utils/request'
 import styles from './index.module.less'
 
@@ -11,7 +12,9 @@ export default () => {
   const [owner, setOwner] = useState(null)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [campaignBalance, setCampaignBalance] = useState(0)
   const { address } = useAccount()
+  const { data: signer } = useSigner()
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const id = params.get('id')
@@ -39,6 +42,23 @@ export default () => {
       setData(ret.result)
     }
   }
+
+  useEffect(() => {
+    if (data && data.campaignAddress && signer) {
+      const token = new ethers.Contract(
+        USDT_TOKEN_ADDRESS,
+        [
+          'function approve(address spender, uint256 amount) external returns (bool)',
+          'function balanceOf(address account) view returns (uint256)',
+          'event Approval(address indexed owner, address indexed spender, uint256 value)'
+        ],
+        signer
+      )
+      token
+        .balanceOf(data.campaignAddress)
+        .then((balance) => setCampaignBalance(balance.toNumber()))
+    }
+  }, [data])
 
   useEffect(() => {
     Promise.all([queryTaskOwnerDetail(), queryTaskDetail()]).then(() => {
@@ -105,7 +125,7 @@ export default () => {
           <Descriptions.Item label="广告主">{owner.owner}</Descriptions.Item>
           <Descriptions.Item label="投资方">{owner.investmentInstitutions}</Descriptions.Item>
           <Descriptions.Item label="标签">{owner.tags}</Descriptions.Item>
-          <Descriptions.Item label={`ContractAddress(${owner.chainNetwork})`} span={3}>
+          <Descriptions.Item label="广告主合约" span={3}>
             {owner.contractAddress}
           </Descriptions.Item>
         </Descriptions>
@@ -118,6 +138,8 @@ export default () => {
               href={`https://www.adventure3.tk/detail?id=${data.projectTaskId}`}
             >{`https://www.adventure3.tk/detail?id=${data.projectTaskId}`}</a>
           </Descriptions.Item>
+          <Descriptions.Item label="活动合约">{data.campaignAddress}</Descriptions.Item>
+          <Descriptions.Item label="合约余额">{campaignBalance}</Descriptions.Item>
         </Descriptions>
       </Card>
       <Card style={{ marginTop: '16px' }}>
