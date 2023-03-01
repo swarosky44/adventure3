@@ -30,18 +30,21 @@ export default () => {
 
   // 加密 csv 数据
   const encryptoDataFormat = async (data) => {
+    console.info([
+      data[0],
+      data[1],
+      data[2],
+      ethers.utils.parseUnits(data[3].toString(), 6).toNumber()
+    ])
     // 创建消息
-    const message = ethers.utils.solidityKeccak256(
+    const messageHash = ethers.utils.solidityKeccak256(
       ['address', 'string', 'address', 'uint256'],
-      data
+      [data[0], data[1], data[2], ethers.utils.parseUnits(data[3].toString(), 6).toNumber()]
     )
     // 签名
-    const messageHashBytes = ethers.utils.arrayify(message)
+    const messageHashBytes = ethers.utils.arrayify(messageHash)
     const signature = await wallet.signMessage(messageHashBytes)
-    const r = signature.slice(0, 66)
-    const s = `0x${signature.slice(66, 130)}`
-    const v = parseInt(signature.slice(130, 132), 16)
-    return { r, s, v }
+    return ethers.utils.splitSignature(signature)
   }
 
   // 上传 csv 文件

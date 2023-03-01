@@ -53,10 +53,9 @@ const Profile = () => {
         cpaTaskFeeKeyV,
         projectTaskDTO
       } = data
-      const { projectTaskId } = projectTaskDTO
+      const { projectTaskId, campaignAddress } = projectTaskDTO
       const actionFee = ethers.utils.parseUnits(actionTaskFeeAmount.toString(), 6).toNumber()
       const cpaFee = ethers.utils.parseUnits(cpaTaskFeeAmount.toString(), 6).toNumber()
-      const campaignAddress = '0xa16E02E87b7454126E5E10d957A927A7F5B5d2be'
 
       const contract = new ethers.Contract(campaignAddress, CampaignAbi, signer)
       const feeData = await getCurrentGasPrice()
@@ -67,10 +66,11 @@ const Profile = () => {
 
       if (type === 'cpa') {
         // 分享任务奖励
-        const signature = `${cpaTaskFeeKeyR}${cpaTaskFeeKeyS.slice(
-          2,
-          cpaTaskFeeKeyS.length
-        )}${Number(cpaTaskFeeKeyV).toString(16)}`
+        const signature = ethers.utils.joinSignature({
+          r: cpaTaskFeeKeyR,
+          s: cpaTaskFeeKeyS,
+          v: cpaTaskFeeKeyV
+        })
         if (signature !== '0') {
           await contract.claimCpaReward(cpaFee, signature, gasParams)
           contract.once('ClaimCpaReward', async () => {
@@ -81,10 +81,11 @@ const Profile = () => {
         }
       } else if (type === 'task') {
         // 行为任务奖励
-        const signature = `${actionTaskFeeKeyR}${actionTaskFeeKeyS.slice(
-          2,
-          actionTaskFeeKeyV.length
-        )}${Number(actionTaskFeeKeyV).toString(16)}`
+        const signature = ethers.utils.joinSignature({
+          r: actionTaskFeeKeyR,
+          s: actionTaskFeeKeyS,
+          v: actionTaskFeeKeyV
+        })
         if (signature !== '0') {
           await contract.claimTaskReward(actionFee, signature, gasParams)
           contract.once('ClaimTaskReward', async () => {

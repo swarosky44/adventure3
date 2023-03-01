@@ -16,21 +16,21 @@ export const ENV =
     ? 'test'
     : window.location.search.indexOf('env=daily') >= 0
     ? 'daily'
-    : 'daily'
+    : 'test'
 
 export const AD3HUB_ADDRESS =
   ENV === 'test'
     ? '0x16b10cA75c518065125991AaFd344189594Fe4Dc'
     : ENV === 'daily'
     ? '0x5FbDB2315678afecb367f032d93F642f64180aa3'
-    : '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+    : '0x16b10cA75c518065125991AaFd344189594Fe4Dc'
 
 export const USDT_TOKEN_ADDRESS =
   ENV === 'test'
     ? '0x4F17af30a1479944c3F7E55897Dc2DEC0766B06A'
     : ENV === 'daily'
     ? '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
-    : '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+    : '0x4F17af30a1479944c3F7E55897Dc2DEC0766B06A'
 
 export const TASK_TYPE = [
   { key: 'FOLLOW_TWITTER', name: '关注推特' },

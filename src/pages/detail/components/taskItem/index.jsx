@@ -71,6 +71,8 @@ export default ({
       setTimeout(() => {
         setLoading(false)
       }, 1000)
+    } else if (ret && ret.message) {
+      message.warning(ret.message)
     }
   }
 

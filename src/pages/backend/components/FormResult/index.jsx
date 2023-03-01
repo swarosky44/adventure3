@@ -36,8 +36,12 @@ const FormResult = ({ data = null, setCurrent = () => {} }) => {
             重新创建
           </Button>,
           <Button key="detail">
-            <a target="_blank" href={`https://www.adventure3.tk/detail?id=${result}`}>
-              查看配置详情
+            <a
+              target="_blank"
+              href={`https://www.adventure3.tk/backend/detail?id=${result}`}
+              style={{ color: '#333' }}
+            >
+              任务详情
             </a>
           </Button>
         ]}
