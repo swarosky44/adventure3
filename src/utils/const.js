@@ -33,9 +33,25 @@ export const USDT_TOKEN_ADDRESS =
     : '0x4F17af30a1479944c3F7E55897Dc2DEC0766B06A'
 
 export const TASK_TYPE = [
-  { key: 'FOLLOW_TWITTER', name: '关注推特' },
-  { key: 'RETWEET', name: '转发推特' },
-  { key: 'JOIN_DISCORD', name: '加入 Discord' },
-  { key: 'JOIN_TELEGRAM', name: '加入 Telegram' },
-  { key: 'VISIT_PAGE', name: '浏览网页' }
+  {
+    key: 'FOLLOW_TWITTER',
+    name: '关注推特',
+    iconUrl: 'twitter-icon.png'
+  },
+  {
+    key: 'RETWEET',
+    name: '转发推特',
+    iconUrl: 'discord-icon.png'
+  },
+  {
+    key: 'JOIN_DISCORD',
+    name: '加入 Discord',
+    iconUrl: 'discord-icon.png'
+  },
+  {
+    key: 'JOIN_TELEGRAM',
+    name: '加入 Telegram',
+    iconUrl: 'telegram-icon.png'
+  },
+  { key: 'VISIT_PAGE', name: '浏览网页', iconUrl: '' }
 ]

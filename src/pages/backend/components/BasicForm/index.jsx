@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Form, Input, Upload, Button, message } from 'antd'
-import { InboxOutlined } from '@ant-design/icons'
+import { PlusOutlined } from '@ant-design/icons'
 import { useAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { request } from '@/utils/request'
@@ -11,6 +11,7 @@ const BasicForm = ({ setCurrent = () => {} }) => {
   const { address, isConnected } = useAccount()
   const { openConnectModal } = useConnectModal()
   const [loading, setLoading] = useState(false)
+  const [fileList, setFileList] = useState([])
 
   // 校验项目名称
   const checkCommutityName = async (_, value = '') => {
@@ -103,6 +104,14 @@ const BasicForm = ({ setCurrent = () => {} }) => {
         tags,
         whitePaper
       })
+      setFileList([
+        {
+          name: 'logo.png',
+          status: 'done',
+          url: logo,
+          onlineUrl: logo
+        }
+      ])
     }
   }
 
@@ -134,10 +143,12 @@ const BasicForm = ({ setCurrent = () => {} }) => {
           <Input />
         </Form.Item>
         <Form.Item name="logo" label="项目LOGO" required valuePropName="file" hasFeedback>
-          <Upload.Dragger
+          <Upload
             name="file"
             accept="image/*"
             action="https://www.adventure3.tk/api/file/upload"
+            listType="picture-card"
+            fileList={fileList}
             headers={{
               authorization: 'authorization-text'
             }}
@@ -154,19 +165,32 @@ const BasicForm = ({ setCurrent = () => {} }) => {
               return false
             }}
             onChange={(info) => {
+              const { fileList } = info
               if (info.file.status === 'done') {
                 const { response } = info.file
                 const { result } = response
                 form.setFieldValue('logo', result)
+                setFileList(fileList.map((f) => ({ ...f, onlineUrl: result })))
                 message.success('上传成功')
+              } else {
+                setFileList(fileList)
               }
             }}
+            onPreview={(file) => {
+              window.open(
+                file.onlineUrl.indexOf('https') >= 0
+                  ? file.onlineUrl
+                  : `https://db35z3hw6fbxp.cloudfront.net/${file.onlineUrl}`
+              )
+            }}
           >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">点击或者拖拽图片到此处进行上传</p>
-          </Upload.Dragger>
+            {fileList.length < 1 ? (
+              <div>
+                <PlusOutlined />
+                <div style={{ marginTop: 8 }}>上传图片</div>
+              </div>
+            ) : null}
+          </Upload>
         </Form.Item>
         <Form.Item
           name="owner"

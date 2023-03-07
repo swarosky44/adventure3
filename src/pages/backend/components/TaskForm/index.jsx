@@ -39,6 +39,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const { switchNetwork } = useSwitchNetwork()
 
   const launchTime = Form.useWatch('launchTime', form)
+  const cpaTaskRewardBudget = Form.useWatch('cpaTaskRewardBudget', form)
 
   // 校验标题
   const checkTitle = async (_, value) => {
@@ -80,6 +81,9 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const checkCpaUnitPrice = async (_, value = 0) => {
     if (value <= 0) {
       throw new Error('Cpa 奖励单价应该大于 0')
+    }
+    if (value > cpaTaskRewardBudget) {
+      throw new Error('Cpa 奖励单价应该小于 Cpa 奖励预算')
     }
     return true
   }
