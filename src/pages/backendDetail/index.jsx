@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Card, Descriptions, Spin, Result, Button, Table } from 'antd'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { useAccount, useSigner } from 'wagmi'
+import { useSigner } from 'wagmi'
 import { ethers } from 'ethers'
 import dayjs from 'dayjs'
 import { TASK_TYPE, USDT_TOKEN_ADDRESS } from '@/utils/const'
@@ -13,20 +13,21 @@ export default () => {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [campaignBalance, setCampaignBalance] = useState(0)
-  const { address } = useAccount()
   const { data: signer } = useSigner()
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const id = params.get('id')
 
   // 查询广告主信息
-  const queryTaskOwnerDetail = async () => {
+  const queryTaskOwnerDetail = async (data) => {
+    const { accountAddress } = data
     const ret = await request({
       api: 'api/project/queryProject',
-      params: { address }
+      params: { address: accountAddress }
     })
     if (ret && ret.result) {
       setOwner(ret.result)
+      setLoading(false)
     }
   }
 
@@ -40,6 +41,7 @@ export default () => {
     })
     if (ret && ret.result) {
       setData(ret.result)
+      queryTaskOwnerDetail(ret.result)
     }
   }
 
@@ -61,9 +63,7 @@ export default () => {
   }, [data])
 
   useEffect(() => {
-    Promise.all([queryTaskOwnerDetail(), queryTaskDetail()]).then(() => {
-      setLoading(false)
-    })
+    queryTaskDetail()
   }, [])
 
   if (loading) {
