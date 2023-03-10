@@ -135,6 +135,7 @@ const Detail = () => {
         <div className={styles.content}>
           <div className={styles.column1}>
             <BasicPannel
+              owner={owner}
               data={projectTaskDTO}
               taskInstance={actionTaskInstance}
               projectTaskId={id}

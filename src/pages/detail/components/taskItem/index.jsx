@@ -8,7 +8,8 @@ import styles from './index.module.less'
 const CHANNEL_ICON_MAP = {
   twitter: 'https://db35z3hw6fbxp.cloudfront.net/twitter-icon.png',
   discord: 'https://db35z3hw6fbxp.cloudfront.net/discord-icon.png',
-  telegram: 'https://db35z3hw6fbxp.cloudfront.net/telegram-icon.png'
+  telegram: 'https://db35z3hw6fbxp.cloudfront.net/telegram-icon.png',
+  custom: 'https://db35z3hw6fbxp.cloudfront.net/website.png'
 }
 export default ({
   projectTaskId = '',
@@ -24,16 +25,14 @@ export default ({
   const { openConnectModal } = useConnectModal()
 
   const switchTaskIcon = () => {
-    if (item.taskType.indexOf('Twitter') >= 0) {
+    if (item.taskType === 'FOLLOW_TWITTER' || item.taskType === 'RETWEET') {
       return CHANNEL_ICON_MAP.twitter
-    } else if (item.taskType.indexOf('Discord') >= 0) {
+    } else if (item.taskType === 'JOIN_DISCORD') {
       return CHANNEL_ICON_MAP.discord
-    } else if (item.taskType.indexOf('Telegram') >= 0) {
+    } else if (item.taskType === 'JOIN_TELEGRAM') {
       return CHANNEL_ICON_MAP.telegram
-    } else if (item.taskType.indexOf('Custom') >= 0) {
-      return item.iconUrl
     } else {
-      return CHANNEL_ICON_MAP.twitter
+      return CHANNEL_ICON_MAP.custom
     }
   }
 

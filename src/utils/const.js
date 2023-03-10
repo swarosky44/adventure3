@@ -41,7 +41,7 @@ export const TASK_TYPE = [
   {
     key: 'RETWEET',
     name: '转发推特',
-    iconUrl: 'discord-icon.png'
+    iconUrl: 'twitter-icon.png'
   },
   {
     key: 'JOIN_DISCORD',

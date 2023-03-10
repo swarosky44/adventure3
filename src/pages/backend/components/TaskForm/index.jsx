@@ -12,9 +12,10 @@ import {
   message,
   ConfigProvider,
   Space,
-  Spin
+  Spin,
+  Tooltip
 } from 'antd'
-import { InboxOutlined, PlusOutlined } from '@ant-design/icons'
+import { InboxOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { ethers } from 'ethers'
 import { useAccount, useSigner, useNetwork, useSwitchNetwork } from 'wagmi'
 import dayjs from 'dayjs'
@@ -57,6 +58,9 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const checkDesc = async (_, value) => {
     if (value.isEmpty()) {
       throw new Error('任务描述不能为空')
+    }
+    if (value.toHTML().length > 8000) {
+      throw new Error('任务描述的字数不应超过 8000 个')
     }
     return true
   }
@@ -337,7 +341,11 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
           </Form.Item>
 
           <div>
-            <Divider>行为任务配置</Divider>
+            <Tooltip title="设立奖金池，激励普通用户参与任务，到期均分开奖">
+              <Divider>
+                行为任务配置 <QuestionCircleOutlined />
+              </Divider>
+            </Tooltip>
             <Form.Item name="actionTaskReward" label="奖励币种" required>
               <Input.Group compact>
                 <Form.Item
@@ -401,7 +409,11 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
           </div>
 
           <div>
-            <Divider>CPA 任务配置</Divider>
+            <Tooltip title="设定 CPA 单价，激励 KOL 裂变推广任务">
+              <Divider>
+                CPA 任务配置 <QuestionCircleOutlined />
+              </Divider>
+            </Tooltip>
             <Form.Item
               name="cpaTaskRewardBudget"
               label="奖励预算"

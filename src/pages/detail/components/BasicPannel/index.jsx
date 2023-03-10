@@ -9,6 +9,7 @@ import styles from './index.module.less'
 
 export default ({
   data = {},
+  owner = {},
   taskInstance = [],
   projectTaskId = '',
   shareId = '',
@@ -82,10 +83,7 @@ export default ({
   return (
     <div className={styles.module}>
       <div className={styles.title}>
-        <img
-          className={styles.companyLogo}
-          src={`https://db35z3hw6fbxp.cloudfront.net/${data.activityImg}`}
-        />
+        {owner && owner.logo ? <img className={styles.companyLogo} src={owner.logo} /> : null}
         {data.title}
         <img
           className={styles.companyVerifyIcon}
