@@ -46,12 +46,12 @@ export default ({
   // 格式化时间
   const formatDate = (dateStr) => {
     const d = new Date(dateStr)
-    const Y = d.getUTCFullYear()
-    const M = d.getUTCMonth() + 1
-    const D = d.getUTCDate()
-    const h = d.getUTCHours()
+    const Y = d.getFullYear()
+    const M = d.getMonth() + 1
+    const D = d.getDate()
+    const h = d.getHours()
     const m = d.getMinutes()
-    const s = d.getUTCSeconds()
+    const s = d.getSeconds()
     return `${Y}-${M >= 10 ? M : `0${M}`}-${D >= 10 ? D : `0${D}`} ${h >= 10 ? h : `0${h}`}:${
       m >= 10 ? m : `0${m}`
     }:${s >= 10 ? s : `0${s}`}`

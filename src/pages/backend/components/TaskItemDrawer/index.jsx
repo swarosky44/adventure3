@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Drawer, Form, Select, Input, Button, Upload, message } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { useEffect } from 'react'
+import { Drawer, Form, Select, Input, Button } from 'antd'
 import { TASK_TYPE } from '@/utils/const'
 
 const TaskItemDrawer = ({
@@ -10,25 +9,17 @@ const TaskItemDrawer = ({
   close = () => {}
 }) => {
   const [form] = Form.useForm()
-  const [fileList, setFileList] = useState([])
-
-  const taskType = Form.useWatch('taskType', form)
 
   const onClose = () => {
-    setFileList([])
     form.resetFields()
     close()
   }
 
   const onSubmit = (values) => {
-    const { taskType, iconUrl } = values
-    if (taskType !== 'VISIT_PAGE') {
-      const item = TASK_TYPE.find((t) => t.key === taskType)
-      values.iconUrl = item.iconUrl
-    } else if (taskType === 'VISIT_PAGE' && typeof iconUrl !== 'string') {
-      message.warning('请等待 ICON 图片上传成功，再保存任务')
-      return
-    }
+    const { taskType } = values
+    const item = TASK_TYPE.find((t) => t.key === taskType)
+    values.iconUrl = item.iconUrl
+
     if (recordItem) {
       setTaskList((v) => {
         const f = [...v]
@@ -45,14 +36,6 @@ const TaskItemDrawer = ({
   useEffect(() => {
     if (recordItem) {
       form.setFieldsValue(recordItem)
-      setFileList([
-        {
-          name: 'iconUrl.png',
-          status: 'done',
-          url: `https://db35z3hw6fbxp.cloudfront.net/${recordItem.iconUrl}`,
-          onlineUrl: `https://db35z3hw6fbxp.cloudfront.net/${recordItem.iconUrl}`
-        }
-      ])
     }
   }, [recordItem])
 
@@ -90,57 +73,6 @@ const TaskItemDrawer = ({
         >
           <Input />
         </Form.Item>
-        {taskType === 'VISIT_PAGE' ? (
-          <Form.Item name="iconUrl" label="任务图标" valuePropName="file" required hasFeedback>
-            <Upload
-              name="file"
-              accept="image/*"
-              action="https://www.adventure3.tk/api/file/upload"
-              listType="picture-card"
-              fileList={fileList}
-              headers={{
-                authorization: 'authorization-text'
-              }}
-              beforeUpload={(file) => {
-                const isJPG = file.type === 'image/jpeg'
-                const isPNG = file.type === 'image/png'
-                const isBMP = file.type === 'image/bmp'
-                const isGIF = file.type === 'image/gif'
-                const isWEBP = file.type === 'image/webp'
-                const isPic = isJPG || isPNG || isBMP || isGIF || isWEBP
-                if (isPic) {
-                  return true
-                }
-                return false
-              }}
-              onChange={(info) => {
-                const { fileList } = info
-                if (info.file.status === 'done') {
-                  const { response } = info.file
-                  const { result } = response
-                  form.setFieldValue('iconUrl', result)
-                  setFileList(fileList.map((f) => ({ ...f, onlineUrl: result })))
-                  message.success('上传成功')
-                }
-                setFileList(fileList)
-              }}
-              onPreview={(file) => {
-                window.open(
-                  file.onlineUrl.indexOf('https') >= 0
-                    ? file.onlineUrl
-                    : `https://db35z3hw6fbxp.cloudfront.net/${file.onlineUrl}`
-                )
-              }}
-            >
-              {fileList.length < 1 ? (
-                <div>
-                  <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>上传图片</div>
-                </div>
-              ) : null}
-            </Upload>
-          </Form.Item>
-        ) : null}
         <Form.Item>
           <Button type="primary" htmlType="submit">
             保存

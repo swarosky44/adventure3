@@ -206,9 +206,11 @@ const Profile = () => {
           title: 'cpa action',
           render: (_, record) => (
             <Space size="middle">
-              <a onClick={() => onWithdraw(record, 'cpa')}>
-                {record.cpaTaskFeeAmount > 0 ? 'Withdraw' : '-'}
-              </a>
+              {record.cpaTaskFeeAmount > 0 ? (
+                <a onClick={() => onWithdraw(record, 'cpa')}>Withdraw</a>
+              ) : (
+                '-'
+              )}
             </Space>
           )
         },
@@ -216,9 +218,11 @@ const Profile = () => {
           title: 'task action',
           render: (_, record) => (
             <Space size="middle">
-              <a onClick={() => onWithdraw(record, 'task')}>
-                {record.actionTaskFeeAmount > 0 ? 'Wthdraw' : '-'}
-              </a>
+              {record.actionTaskFeeAmount > 0 ? (
+                <a onClick={() => onWithdraw(record, 'task')}>Wthdraw</a>
+              ) : (
+                '-'
+              )}
             </Space>
           )
         }

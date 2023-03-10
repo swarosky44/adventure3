@@ -95,7 +95,7 @@ export default ({ data = {}, cpa = {}, action = {} }) => {
               className={styles.icon}
               src="https://db35z3hw6fbxp.cloudfront.net/custom-icon.png"
             />
-            Bouns
+            Bonus
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@ export default ({ data = {}, cpa = {}, action = {} }) => {
             className={styles.cardTitleIcon}
             src="https://db35z3hw6fbxp.cloudfront.net/bouns-icon.png"
           />
-          <div className={styles.cardTitleText}>Bouns</div>
+          <div className={styles.cardTitleText}>Bonus</div>
           <img
             className={styles.chainIcon}
             src="https://db35z3hw6fbxp.cloudfront.net/ethereum.png"

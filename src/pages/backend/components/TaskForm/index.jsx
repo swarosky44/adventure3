@@ -331,7 +331,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
               showTime
               style={{ width: '800px' }}
               disabledDate={(current) => {
-                return current && current < dayjs().endOf('day')
+                return current && current < dayjs().startOf('day')
               }}
             />
           </Form.Item>

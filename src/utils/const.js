@@ -53,5 +53,5 @@ export const TASK_TYPE = [
     name: '加入 Telegram',
     iconUrl: 'telegram-icon.png'
   },
-  { key: 'VISIT_PAGE', name: '浏览网页', iconUrl: '' }
+  { key: 'VISIT_PAGE', name: '浏览网页', iconUrl: 'website.png' }
 ]
