@@ -7,7 +7,7 @@ import { ALCHEMY_POLYGON_AD3_KEY, ALCHEMY_MUMBAI_AD3_KEY, ENV } from '@/utils/co
 import { request } from '@/utils/request'
 import styles from './index.module.less'
 
-let privateKey = '6d508f0fd0f4ba21aac1e32391d2b6299a2a453958a9010b1b587c1fc358f5c7'
+let privateKey = ''
 export default () => {
   const [dataSource, setDataSource] = useState([])
   const [wallet, setWallet] = useState(null)

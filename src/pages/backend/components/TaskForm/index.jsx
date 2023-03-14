@@ -238,8 +238,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   // 更新活动内的合约地址
   const onUpdate = async ({ id = 0, campaignAddress = '' }) => {
     return await request({
-      method: 'POST',
-      api: 'api/project/saveProject',
+      api: 'api/projectTask/updateProjectTask',
       params: {
         campaignAddress,
         projectTaskId: id
