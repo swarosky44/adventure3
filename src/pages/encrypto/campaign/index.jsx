@@ -44,7 +44,7 @@ export default () => {
     // 签名
     const messageHashBytes = ethers.utils.arrayify(messageHash)
     const signature = await wallet.signMessage(messageHashBytes)
-    return ethers.utils.splitSignature(signature)
+    return { ...ethers.utils.splitSignature(signature), signature }
   }
 
   // 上传 csv 文件
@@ -62,7 +62,8 @@ export default () => {
             ...row,
             cpaTaskFeeKeyR: ret.r,
             cpaTaskFeeKeyS: ret.s,
-            cpaTaskFeeKeyV: ret.v
+            cpaTaskFeeKeyV: ret.v,
+            cpaSignature: ret.signature
           }))
         })
 
@@ -74,7 +75,8 @@ export default () => {
             ...row,
             actionTaskFeeKeyR: ret.r,
             actionTaskFeeKeyS: ret.s,
-            actionTaskFeeKeyV: ret.v
+            actionTaskFeeKeyV: ret.v,
+            actionSignature: ret.signature
           }))
         })
 
@@ -89,6 +91,7 @@ export default () => {
         }
         return result
       }, [])
+      console.info('formatCryptoData', formatCryptoData)
       setDataSource(formatCryptoData)
     })
     reader.readAsText(el.files[0])

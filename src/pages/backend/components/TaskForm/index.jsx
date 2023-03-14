@@ -13,7 +13,8 @@ import {
   ConfigProvider,
   Space,
   Spin,
-  Tooltip
+  Tooltip,
+  notification
 } from 'antd'
 import { InboxOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { ethers } from 'ethers'
@@ -33,6 +34,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const [taskList, setTaskList] = useState([])
   const [recordItem, setRecordItem] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [loadingText, setLoadingText] = useState('')
   const [form] = Form.useForm()
   const { address } = useAccount()
   const { data: signer } = useSigner()
@@ -92,6 +94,40 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
     return true
   }
 
+  // 提交表单 - 创建活动
+  const onSubmit = async (values) => {
+    setLoadingText('正在创建活动，请耐心等待')
+
+    const params = {
+      accountAddress: address,
+      campaignAddress: '',
+      title: values.title,
+      desc: values.desc.toHTML(),
+      activityImg: values.activityImg,
+      launchStartTime: values.launchTime[0].format(),
+      launchEndTime: values.launchTime[1].format(),
+      isActionTask: true,
+      actionTaskRewardUnit: values.actionTaskReward.rewardName,
+      actionTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
+      actionTaskRewardNum: values.actionTaskRewardBudget / values.actionTaskRewardNum,
+      actionTaskRewardBudget: values.actionTaskRewardBudget,
+      actionTaskDrawTime: values.actionTaskDrawTime.format(),
+      actionTaskDTOS: tempTaskList,
+      isCpaTask: true,
+      cpaTaskRewardUnit: values.actionTaskReward.rewardName,
+      cpaTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
+      cpaTaskRewardBudget: values.cpaTaskRewardBudget,
+      cpaTaskBiddingType: values.cpaTaskBiddingType,
+      cpaTaskPerPrice: values.cpaTaskPerPrice,
+      productizationLink: ''
+    }
+    return await request({
+      method: 'POST',
+      api: 'api/projectTask/saveProjectTask',
+      params
+    })
+  }
+
   // 获取活动合约的地址
   const getCampaignAddress = async ({ contract }) => {
     const signerAddress = await signer.getAddress()
@@ -104,6 +140,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const onCreate = async (values) => {
     try {
       // 链上对象 & 参数
+      const campaignId = values.campaignId
       const tokenAddress = USDT_TOKEN_ADDRESS
       const contract = new ethers.Contract(AD3HUB_ADDRESS, Ad3HubAbi, signer)
       const token = new ethers.Contract(
@@ -140,35 +177,74 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       const balance = await token.balanceOf(signer.getAddress())
       const total = cpaBonusBudget + taskBonusBudget
       if (balance.toNumber() <= total) {
-        message.warning('您的钱包余额不足以支付本次活动预算')
-        return ''
+        notification.warning({
+          message: 'STEP2 创建链上合约失败',
+          description: '您的钱包余额不足以支付本次活动预算'
+        })
+        return
       }
       // 申请额度
-      await token.approve(AD3HUB_ADDRESS, (cpaBonusBudget + taskBonusBudget) * 10, gasParams)
-      await (() =>
-        new Promise((resolve) => {
-          token.once('Approval', async () => {
-            resolve()
+      setLoadingText('正在申请链上 TOKEN 的消费额度，请耐心等待，并尽快签名钱包内的申请')
+      const approveTx = await token.approve(
+        AD3HUB_ADDRESS,
+        (cpaBonusBudget + taskBonusBudget) * 10,
+        gasParams
+      )
+      const approveTxResult = await approveTx.wait()
+      if (`${approveTxResult.status}` === '1') {
+        // 创建链上活动合约
+        setLoadingText('正在创建链上合约，请耐心等待，并尽快签名钱包内的申请')
+        const createCampaignTx = await contract.createCampaign(
+          campaignId,
+          cpaBonusBudget,
+          taskBonusBudget,
+          tokenAddress,
+          tokenAddress,
+          {
+            maxFeePerGas: feeData.maxFeePerGas,
+            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+          }
+        )
+        const createCampaignTxResult = await createCampaignTx.wait()
+
+        if (`${createCampaignTxResult.status}` === '1') {
+          setLoadingText('正在查询链上合约地址，请耐心等待')
+          const campaignAddress = await getCampaignAddress({ contract })
+          return { success: true, campaignAddress }
+        } else {
+          notification.warning({
+            message: 'STEP4 创建链上合约失败',
+            description: '链上支付失败，请查看钱包活动内的具体原因'
           })
-        }))()
-      // 创建链上活动合约
-      await contract.createCampaign(cpaBonusBudget, taskBonusBudget, tokenAddress, tokenAddress, {
-        maxFeePerGas: feeData.maxFeePerGas,
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
-      })
-      await (() =>
-        new Promise((resolve) => {
-          contract.once('CreateCampaign', () => {
-            resolve()
-          })
-        }))()
-      const address = await getCampaignAddress({ contract })
-      return address
+          return { success: false }
+        }
+      } else {
+        notification.warning({
+          message: 'STEP3 申请链上 TOKEN 额度失败',
+          description: '链上支付失败，请查看钱包活动内的具体原因'
+        })
+        return { success: false }
+      }
     } catch (error) {
       console.warn(error)
-      message.warning('链上支付失败，请查看钱包活动内的具体原因')
-      return ''
+      notification.warning({
+        message: 'STEP5 创建链上合约失败',
+        description: '链上支付失败，请查看钱包活动内的具体原因'
+      })
+      return { success: false }
     }
+  }
+
+  // 更新活动内的合约地址
+  const onUpdate = async ({ id = 0, campaignAddress = '' }) => {
+    return await request({
+      method: 'POST',
+      api: 'api/project/saveProject',
+      params: {
+        campaignAddress,
+        projectTaskId: id
+      }
+    })
   }
 
   const onPayOnChain = useCallback(
@@ -185,68 +261,57 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
         switchNetwork(Number(values.actionTaskReward.chainNetwork))
         return
       }
+
       if (signer && !loading) {
         setLoading(true)
 
-        const result = await onCreate({
-          actionTaskReward: {
-            rewardName: values.actionTaskReward.rewardName,
-            rewardBudget: values.actionTaskRewardBudget
-          },
-          cpaTaskReward: {
-            rewardName: values.actionTaskReward.rewardName,
-            rewardBudget: values.cpaTaskRewardBudget
+        // 中心化服务活动
+        const activity = await onSubmit(values)
+
+        if (activity && `${activity.success}` === 'true') {
+          // 创建链上合约 & 支付
+          const onCreateResult = await onCreate({
+            campaignId: activity.result,
+            actionTaskReward: {
+              rewardName: values.actionTaskReward.rewardName,
+              rewardBudget: values.actionTaskRewardBudget
+            },
+            cpaTaskReward: {
+              rewardName: values.actionTaskReward.rewardName,
+              rewardBudget: values.cpaTaskRewardBudget
+            }
+          })
+          if (onCreateResult.success) {
+            // 更新中心化服务地址
+            const updateResult = await onUpdate({
+              id: activity.result,
+              campaignAddress: onCreateResult.campaignAddress
+            })
+            console.info('updateResult ==> ', updateResult)
+
+            // 结束
+            setLoading(false)
+            setLoadingText('')
+            setTaskResult(activity)
+            setCurrent(2)
+          } else {
+            notification.warning({
+              message: 'STEP6 创建链上合约失败',
+              description: '网络异常，请稍后重试'
+            })
+            setLoading(false)
           }
-        })
-        onSubmit(values, result)
+        } else {
+          notification.warning({
+            message: 'STEP1 创建活动失败',
+            description: '网络异常，请稍后重试'
+          })
+          setLoading(false)
+        }
       }
     },
     [signer, loading, chain]
   )
-
-  // 提交表单
-  const onSubmit = async (values, campaignAddress) => {
-    if (!campaignAddress) {
-      setLoading(false)
-      return
-    }
-    const params = {
-      accountAddress: address,
-      campaignAddress: campaignAddress,
-      title: values.title,
-      desc: values.desc.toHTML(),
-      activityImg: values.activityImg,
-      launchStartTime: values.launchTime[0].format(),
-      launchEndTime: values.launchTime[1].format(),
-      isActionTask: true,
-      actionTaskRewardUnit: values.actionTaskReward.rewardName,
-      actionTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
-      actionTaskRewardNum: values.actionTaskRewardBudget / values.actionTaskRewardNum,
-      actionTaskRewardBudget: values.actionTaskRewardBudget,
-      actionTaskDrawTime: values.actionTaskDrawTime.format(),
-      actionTaskDTOS: tempTaskList,
-      isCpaTask: true,
-      cpaTaskRewardUnit: values.actionTaskReward.rewardName,
-      cpaTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
-      cpaTaskRewardBudget: values.cpaTaskRewardBudget,
-      cpaTaskBiddingType: values.cpaTaskBiddingType,
-      cpaTaskPerPrice: values.cpaTaskPerPrice,
-      productizationLink: ''
-    }
-    const ret = await request({
-      method: 'POST',
-      api: 'api/projectTask/saveProjectTask',
-      params
-    })
-    if (ret && ret.result) {
-      setCurrent(2)
-      setTaskResult(ret)
-      setLoading(false)
-    } else {
-      message.warning('网络异常，请稍后重试 ~')
-      setLoading(false)
-    }
-  }
 
   useEffect(() => {
     tempTaskList = taskList
@@ -561,7 +626,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       {loading ? (
         <div className={styles.loadingPage}>
           <Spin size="large" />
-          <p>请耐心等待链上支付完成，及时查看钱包需要签名的步骤哟</p>
+          <p>{loadingText}</p>
         </div>
       ) : null}
     </div>

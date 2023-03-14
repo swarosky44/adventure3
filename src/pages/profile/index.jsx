@@ -72,10 +72,11 @@ const Profile = () => {
           v: cpaTaskFeeKeyV
         })
         if (signature !== '0') {
-          await contract.claimCpaReward(cpaFee, signature, gasParams)
-          contract.once('ClaimCpaReward', async () => {
+          const claimCpaRewardTx = await contract.claimCpaReward(cpaFee, signature, gasParams)
+          const claimCpaRewardTxResult = await claimCpaRewardTx.wait()
+          if (`${claimCpaRewardTxResult.status}` === '1') {
             await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })
-          })
+          }
         } else {
           throw new Error('AD3Hub: PrizeSignature invalid.')
         }
@@ -87,10 +88,11 @@ const Profile = () => {
           v: actionTaskFeeKeyV
         })
         if (signature !== '0') {
-          await contract.claimTaskReward(actionFee, signature, gasParams)
-          contract.once('ClaimTaskReward', async () => {
+          const claimTaskRewardTx = await contract.claimTaskReward(actionFee, signature, gasParams)
+          const claimTaskRewardTxResult = await claimTaskRewardTx.wait()
+          if (`${claimTaskRewardTxResult.status}` === '1') {
             await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })
-          })
+          }
         } else {
           throw new Error('AD3Hub: PrizeSignature invalid.')
         }
@@ -107,6 +109,11 @@ const Profile = () => {
   }
 
   const columns = [
+    {
+      title: 'Id',
+      dataIndex: 'projectTaskId',
+      width: '5%'
+    },
     {
       title: 'Task Name',
       dataIndex: 'projectTaskDTO.title',
@@ -294,6 +301,7 @@ const Profile = () => {
     )
   }
 
+  console.info(data)
   return (
     <div className={styles.page}>
       <header className={styles.header}>

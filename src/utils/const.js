@@ -1,11 +1,12 @@
 export const ALCHEMY_POLYGON_AD3_KEY =
   'https://polygon-mainnet.g.alchemy.com/v2/5aSHl7b-uw8NS_voiPDrdHDp5s7LEJhF'
 
-export const ALCHEMY_MAINNET_AD3_KEY =
-  'https://eth-mainnet.g.alchemy.com/v2/dyCEPWX_mo0xyKvBoURmAm4jZHV9dUWf'
-
 export const ALCHEMY_MUMBAI_AD3_KEY =
   'https://polygon-mumbai.g.alchemy.com/v2/Ko5Mfq83UFafu5lEO_znMcqjoTgRaWJ7'
+
+export const ALCHEMY_POLYGON_AD3_PRIVATE_KEY = '5aSHl7b-uw8NS_voiPDrdHDp5s7LEJhF'
+
+export const ALCHEMY_MUMBAI_AD3_PRIVATE_KEY = 'Ko5Mfq83UFafu5lEO_znMcqjoTgRaWJ7'
 
 export const PRO_API_PREFIX = 'https://www.adventure3.tk'
 
@@ -20,17 +21,20 @@ export const ENV =
 
 export const AD3HUB_ADDRESS =
   ENV === 'test'
-    ? '0x16b10cA75c518065125991AaFd344189594Fe4Dc'
+    ? '0xeCD374aB5EF4D1CDcB53977d9051EaEFdEf314b9'
     : ENV === 'daily'
     ? '0x5FbDB2315678afecb367f032d93F642f64180aa3'
-    : '0x16b10cA75c518065125991AaFd344189594Fe4Dc'
+    : '0xeCD374aB5EF4D1CDcB53977d9051EaEFdEf314b9'
 
 export const USDT_TOKEN_ADDRESS =
   ENV === 'test'
-    ? '0x4F17af30a1479944c3F7E55897Dc2DEC0766B06A'
+    ? '0x1896E1331FCb0DDd76086aadF797A09fFea5EA46'
     : ENV === 'daily'
     ? '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
-    : '0x4F17af30a1479944c3F7E55897Dc2DEC0766B06A'
+    : '0x1896E1331FCb0DDd76086aadF797A09fFea5EA46'
+
+export const ALCHEMY_PRIVATE_KEY =
+  ENV === 'test' ? ALCHEMY_MUMBAI_AD3_PRIVATE_KEY : ALCHEMY_POLYGON_AD3_PRIVATE_KEY
 
 export const TASK_TYPE = [
   {
