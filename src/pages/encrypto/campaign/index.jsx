@@ -30,12 +30,6 @@ export default () => {
 
   // 加密 csv 数据
   const encryptoDataFormat = async (data) => {
-    console.info([
-      data[0],
-      data[1],
-      data[2],
-      ethers.utils.parseUnits(data[3].toString(), 6).toNumber()
-    ])
     // 创建消息
     const messageHash = ethers.utils.solidityKeccak256(
       ['address', 'string', 'address', 'uint256'],
@@ -91,7 +85,6 @@ export default () => {
         }
         return result
       }, [])
-      console.info('formatCryptoData', formatCryptoData)
       setDataSource(formatCryptoData)
     })
     reader.readAsText(el.files[0])

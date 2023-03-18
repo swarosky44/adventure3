@@ -1,7 +1,6 @@
 import styles from './index.module.less'
 
 export default ({ data = {} }) => {
-  console.info(data)
   return (
     <div className={styles.module}>
       <div className={styles.title}>Description</div>

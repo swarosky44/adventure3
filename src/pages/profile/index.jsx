@@ -301,7 +301,6 @@ const Profile = () => {
     )
   }
 
-  console.info(data)
   return (
     <div className={styles.page}>
       <header className={styles.header}>

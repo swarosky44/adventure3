@@ -282,11 +282,10 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
           })
           if (onCreateResult.success) {
             // 更新中心化服务地址
-            const updateResult = await onUpdate({
+            await onUpdate({
               id: activity.result,
               campaignAddress: onCreateResult.campaignAddress
             })
-            console.info('updateResult ==> ', updateResult)
 
             // 结束
             setLoading(false)
