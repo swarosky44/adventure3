@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { isMobile } from 'react-device-detect'
 import { PlusOutlined } from '@ant-design/icons'
 import { useAccount, useSigner } from 'wagmi'
-import { Space, Table, Result, message, notification } from 'antd'
+import { Space, Table, Result, notification } from 'antd'
 import { ethers } from 'ethers'
 import dayjs from 'dayjs'
 import CampaignAbi from '@/utils/Campaign.json'
@@ -107,11 +107,20 @@ const Profile = () => {
       }
     } catch (error) {
       if (error.message.indexOf('PrizeSignature invalid') >= 0) {
-        message.warning('AD3Hub: PrizeSignature invalid.')
+        notification.warning({
+          message: 'Claim reward failured',
+          description: 'AD3Hub: PrizeSignature invalid.'
+        })
       } else if (error.message.indexOf('AD3Hub: Repeated claim reward.') >= 0) {
-        message.warning('AD3Hub: Repeated claim reward.')
+        notification.warning({
+          message: 'Claim reward failured',
+          description: 'AD3Hub: Repeated claim reward.'
+        })
       } else {
-        message.warning(error.message)
+        notification.warning({
+          message: 'AD3Hub: Repeated claim reward.',
+          description: error.message
+        })
       }
     }
   }
