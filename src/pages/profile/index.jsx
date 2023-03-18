@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { isMobile } from 'react-device-detect'
 import { PlusOutlined } from '@ant-design/icons'
 import { useAccount, useSigner } from 'wagmi'
-import { Space, Table, Result, message } from 'antd'
+import { Space, Table, Result, message, notification } from 'antd'
 import { ethers } from 'ethers'
 import dayjs from 'dayjs'
 import CampaignAbi from '@/utils/Campaign.json'
@@ -77,6 +77,10 @@ const Profile = () => {
           if (`${claimCpaRewardTxResult.status}` === '1') {
             await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })
           }
+          notification.success({
+            message: 'Congratulations',
+            description: 'Claim Cpa Reward Success'
+          })
         } else {
           throw new Error('AD3Hub: PrizeSignature invalid.')
         }
@@ -93,6 +97,10 @@ const Profile = () => {
           if (`${claimTaskRewardTxResult.status}` === '1') {
             await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })
           }
+          notification.success({
+            message: 'Congratulations',
+            description: 'Claim Task Reward Success'
+          })
         } else {
           throw new Error('AD3Hub: PrizeSignature invalid.')
         }
@@ -176,26 +184,6 @@ const Profile = () => {
         }
       ]
     },
-    // {
-    //   title: '已提现',
-    //   colSpan: 2,
-    //   children: [
-    //     {
-    //       title: 'cpa amount',
-    //       dataIndex: 'cpaTaskRewardBudget',
-    //       render: (_, record) => (
-    //         <Space size="middle">{record.projectTaskDTO.cpaTaskRewardBudget}</Space>
-    //       )
-    //     },
-    //     {
-    //       title: 'task amount',
-    //       dataIndex: 'actionTaskRewardBudget',
-    //       render: (_, record) => (
-    //         <Space size="middle">{record.projectTaskDTO.actionTaskRewardBudget}</Space>
-    //       )
-    //     }
-    //   ]
-    // },
     {
       title: 'EndTime',
       dataIndex: 'launchEndTime',
