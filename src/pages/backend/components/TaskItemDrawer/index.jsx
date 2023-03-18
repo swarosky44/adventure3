@@ -20,6 +20,14 @@ const TaskItemDrawer = ({
     const item = TASK_TYPE.find((t) => t.key === taskType)
     values.iconUrl = item.iconUrl
 
+    // 格式化 URL 链接
+    if (
+      !(values.actionObject.startsWith('https://') || values.actionObject.startsWith('http://'))
+    ) {
+      values.actionObject = `https://${values.actionObject}`
+    }
+    console.info(values)
+
     if (recordItem) {
       setTaskList((v) => {
         const f = [...v]
@@ -64,14 +72,8 @@ const TaskItemDrawer = ({
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          name="actionObject"
-          label="任务链接"
-          required
-          hasFeedback
-          rules={[{ type: 'url', message: '请输入正确的任务链接' }]}
-        >
-          <Input />
+        <Form.Item name="actionObject" label="任务链接" required hasFeedback>
+          <Input addonBefore="https://" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">

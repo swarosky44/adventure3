@@ -478,6 +478,32 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
                 CPA 任务配置 <QuestionCircleOutlined />
               </Divider>
             </Tooltip>
+            <Form.Item name="cpaTaskReward" label="奖励币种" required>
+              <Input.Group compact>
+                <Form.Item
+                  name={['cpaTaskReward', 'chainNetwork']}
+                  noStyle
+                  required={[{ required: true, message: '链上环境不能为空' }]}
+                >
+                  <Select style={{ width: 140 }}>
+                    <Select.Option key="Polygon" value="137">
+                      Polygon
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name={['cpaTaskReward', 'rewardName']}
+                  noStyle
+                  required={[{ required: true, message: '奖励币种不能为空' }]}
+                >
+                  <Select style={{ width: 220 }}>
+                    <Select.Option key="usdt" value="usdt">
+                      USDT
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+              </Input.Group>
+            </Form.Item>
             <Form.Item
               name="cpaTaskRewardBudget"
               label="奖励预算"

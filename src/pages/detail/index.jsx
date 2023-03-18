@@ -93,7 +93,7 @@ const Detail = () => {
 
   useEffect(() => {
     queryProjectTaskStatus()
-  }, [])
+  }, [address])
 
   if (loading) {
     return (

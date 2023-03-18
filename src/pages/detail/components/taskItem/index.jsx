@@ -100,7 +100,7 @@ export default ({
               className={styles.doBtn}
               onClick={() => {
                 setItemClickStatus(true)
-                window.open(item.actionObject)
+                location.assign(item.actionObject)
               }}
             >
               GO
