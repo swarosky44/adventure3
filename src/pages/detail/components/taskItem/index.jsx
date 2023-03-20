@@ -18,7 +18,6 @@ export default ({
   index = 0,
   queryProjectTaskStatus = () => {}
 }) => {
-  const [itemClickStatus, setItemClickStatus] = useState(false)
   const [operaVisible, setOperaVisible] = useState(false)
   const [loading, setLoading] = useState(false)
   const { address, isConnected } = useAccount()
@@ -49,7 +48,8 @@ export default ({
     if (loading) {
       return
     }
-    if (!itemClickStatus) {
+    const taskClickStatus = localStorage.getItem(`${item.actionTaskId}-${item.name}`)
+    if (`${taskClickStatus}` !== '1') {
       return message.warning('Please click the GO button and complete the task')
     }
     setLoading(true)
@@ -99,8 +99,8 @@ export default ({
             <div
               className={styles.doBtn}
               onClick={() => {
-                setItemClickStatus(true)
-                location.assign(item.actionObject)
+                localStorage.setItem(`${item.actionTaskId}-${item.name}`, 1)
+                window.open(item.actionObject)
               }}
             >
               GO
