@@ -98,6 +98,10 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
   const onSubmit = async (values) => {
     setLoadingText('正在创建活动，请耐心等待')
 
+    if (!(tempTaskList && tempTaskList.length)) {
+      return { success: false }
+    }
+
     const params = {
       accountAddress: address,
       campaignAddress: '',
@@ -109,7 +113,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       isActionTask: true,
       actionTaskRewardUnit: values.actionTaskReward.rewardName,
       actionTaskRewardChainNetwork: values.actionTaskReward.chainNetwork,
-      actionTaskRewardNum: values.actionTaskRewardBudget / values.actionTaskRewardNum,
+      actionTaskRewardNum: values.actionTaskRewardNum,
       actionTaskRewardBudget: values.actionTaskRewardBudget,
       actionTaskDrawTime: values.actionTaskDrawTime.format(),
       actionTaskDTOS: tempTaskList,
