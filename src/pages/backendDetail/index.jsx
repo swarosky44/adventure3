@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Card, Descriptions, Spin, Result, Button, Table } from 'antd'
+import { Card, Descriptions, Spin, Result, Button, Table, notification } from 'antd'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useSigner } from 'wagmi'
 import { ethers } from 'ethers'
 import dayjs from 'dayjs'
-import { TASK_TYPE, USDT_TOKEN_ADDRESS } from '@/utils/const'
-import { request } from '@/utils/request'
+import { TASK_TYPE, AD3HUB_ADDRESS, USDT_TOKEN_ADDRESS } from '@/utils/const'
+import { request, getCurrentGasPrice } from '@/utils/request'
+import Ad3HubAbi from '@/utils/Ad3Hub.json'
 import styles from './index.module.less'
 
 export default () => {
   const [owner, setOwner] = useState(null)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [loadingBalance, setLoadingBalance] = useState(false)
   const [campaignBalance, setCampaignBalance] = useState(0)
   const { data: signer } = useSigner()
   const [params] = useSearchParams()
@@ -45,8 +47,59 @@ export default () => {
     }
   }
 
+  // 退款
+  const onWithdraw = async () => {
+    try {
+      const { accountAddress, campaignAddress } = data
+      const feeData = await getCurrentGasPrice()
+      const gasParams = {
+        maxFeePerGas: feeData.maxFeePerGas,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+      }
+      const contract = new ethers.Contract(AD3HUB_ADDRESS, Ad3HubAbi, signer, gasParams)
+      const campaignList = await contract.getCampaignAddressList(accountAddress)
+      const campaignIndex = campaignList.findIndex((l) => l === campaignAddress)
+      const withdrawTx = await contract.withdrawCpaBudget(accountAddress, campaignIndex + 1)
+      const withdrawTxResult = await withdrawTx.wait()
+
+      if (`${withdrawTxResult.status}` === '1') {
+        setLoadingBalance(true)
+        const token = new ethers.Contract(
+          USDT_TOKEN_ADDRESS,
+          [
+            'function approve(address spender, uint256 amount) external returns (bool)',
+            'function balanceOf(address account) view returns (uint256)',
+            'event Approval(address indexed owner, address indexed spender, uint256 value)'
+          ],
+          signer
+        )
+        token.balanceOf(campaignAddress).then((balance) => {
+          setLoadingBalance(false)
+          setCampaignBalance(balance.toNumber())
+        })
+        notification.success({
+          message: '退款成功',
+          description: '请及时检查钱包内的余额'
+        })
+      } else {
+        notification.success({
+          message: '退款失败',
+          description: '网络异常，请稍后重试'
+        })
+      }
+    } catch (error) {
+      if (error.message.indexOf('The caller must be ad3hub') >= 0) {
+        notification.warning({
+          message: '退款失败',
+          description: '仅限合约管理员可以操作退款'
+        })
+      }
+    }
+  }
+
   useEffect(() => {
     if (data && data.campaignAddress && signer) {
+      setLoadingBalance(true)
       const token = new ethers.Contract(
         USDT_TOKEN_ADDRESS,
         [
@@ -56,9 +109,10 @@ export default () => {
         ],
         signer
       )
-      token
-        .balanceOf(data.campaignAddress)
-        .then((balance) => setCampaignBalance(balance.toNumber()))
+      token.balanceOf(data.campaignAddress).then((balance) => {
+        setLoadingBalance(false)
+        setCampaignBalance(balance.toNumber())
+      })
     }
   }, [data])
 
@@ -97,7 +151,9 @@ export default () => {
         <Button onClick={() => navigate('/backend/list')} style={{ marginRight: '12px' }}>
           返回列表
         </Button>
-        <Button type="primary">退款</Button>
+        <Button type="primary" onClick={onWithdraw}>
+          退款
+        </Button>
       </Card>
       <Card style={{ marginTop: '16px' }}>
         <Descriptions title="项目基础信息">
@@ -139,7 +195,9 @@ export default () => {
             >{`https://www.adventure3.tk/detail?id=${data.projectTaskId}`}</a>
           </Descriptions.Item>
           <Descriptions.Item label="活动合约">{data.campaignAddress}</Descriptions.Item>
-          <Descriptions.Item label="合约余额">{campaignBalance}</Descriptions.Item>
+          <Descriptions.Item label="合约余额">
+            {loadingBalance ? 'loading' : campaignBalance}
+          </Descriptions.Item>
         </Descriptions>
       </Card>
       <Card style={{ marginTop: '16px' }}>
