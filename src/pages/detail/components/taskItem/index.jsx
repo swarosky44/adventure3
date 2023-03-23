@@ -76,7 +76,7 @@ export default ({
   }
 
   return (
-    <div className={styles.task} key={`task-${index}`}>
+    <div className={styles.task} key={`task-${index}`} id={`detail-task-${item.taskType}-card`}>
       <div className={styles.taskContent} onClick={open}>
         <img className={styles.taskIcon} src={switchTaskIcon()} />
         <span className={styles.taskText}>{item.name || ''}</span>
@@ -97,6 +97,7 @@ export default ({
           ) : null}
           <div className={styles.taskBtns}>
             <div
+              id={`detail-task-${item.taskType}-do-button`}
               className={styles.doBtn}
               onClick={() => {
                 localStorage.setItem(`${item.actionTaskId}-${item.name}`, 1)
@@ -105,7 +106,11 @@ export default ({
             >
               GO
             </div>
-            <div className={styles.verifyBtn} onClick={onFinish}>
+            <div
+              id={`detail-task-${item.taskType}-verify-button`}
+              className={styles.verifyBtn}
+              onClick={onFinish}
+            >
               {loading ? 'Loading ...' : 'Verify'}
             </div>
           </div>

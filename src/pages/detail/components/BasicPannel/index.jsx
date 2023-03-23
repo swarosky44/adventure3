@@ -116,7 +116,7 @@ export default ({
           )
         })}
         {shareCode ? (
-          <div className={styles.task}>
+          <div className={styles.task} id="detail-task-share-card">
             <div className={styles.taskContent} onClick={() => setOperaVisible((v) => !v)}>
               <img
                 className={styles.taskIcon}
@@ -125,7 +125,7 @@ export default ({
               <span className={styles.taskText}>Publish content to bring in users</span>
             </div>
             {operaVisible ? (
-              <div className={styles.taskOperaPannel}>
+              <div className={styles.taskOperaPannel} id="detail-task-share-copy-button">
                 <div className={styles.taskBtns}>
                   <CopyToClipboard
                     text={`https://www.adventure3.tk/detail?id=${projectTaskId}&shareId=${shareCode}`}

@@ -112,13 +112,19 @@ const Detail = () => {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} id="detail-homepage">
       <header className={styles.header}>
         <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
         <div className={styles.right}>
-          <ConnectButton />
+          <div id="detail-connect-button">
+            <ConnectButton />
+          </div>
           {!isMobile ? (
-            <div className={styles.create} onClick={() => navigate('/backend/create')}>
+            <div
+              id="detail-create-adventure-button"
+              className={styles.create}
+              onClick={() => navigate('/backend/create')}
+            >
               <PlusOutlined style={{ marginRight: '8px' }} />
               New Adventure
             </div>
