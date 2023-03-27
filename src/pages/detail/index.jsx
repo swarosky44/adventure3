@@ -8,6 +8,7 @@ import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
 import { Result, Spin } from 'antd'
 import Das from 'das-sdk'
+import Observer from '@researchgate/react-intersection-observer'
 import { request } from '@/utils/request'
 import particlesOpt from './particles.json'
 import BasicPannel from './components/BasicPannel'
@@ -21,7 +22,6 @@ const Detail = () => {
   const [actionTaskInstance, setActionTaskInstance] = useState(null)
   const [actionTaskStatus, setActionTaskStatus] = useState(null)
   const [cpaTaskInstance, setCpaTaskInstance] = useState(null)
-  // const [cpaTaskStatus, setCpaTaskStatus] = useState(null)
   const [projectTaskDTO, setProjectTaskDTO] = useState(null)
   const [isSecurity, setIsSecurity] = useState(false)
   const navigate = useNavigate()
@@ -112,51 +112,61 @@ const Detail = () => {
   }
 
   return (
-    <div className={styles.page} id="detail-homepage">
-      <header className={styles.header}>
-        <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
-        <div className={styles.right}>
-          <div id="detail-connect-button">
-            <ConnectButton />
-          </div>
-          {!isMobile ? (
-            <div
-              id="detail-create-adventure-button"
-              className={styles.create}
-              onClick={() => navigate('/backend/create')}
-            >
-              <PlusOutlined style={{ marginRight: '8px' }} />
-              New Adventure
+    <Observer
+      onChange={() => {
+        window.dataLayer.push({
+          event: 'lp-homepage-expose',
+          address: address || '',
+          projectId: id
+        })
+      }}
+    >
+      <div className={styles.page} id="detail-homepage">
+        <header className={styles.header}>
+          <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
+          <div className={styles.right}>
+            <div id="detail-connect-button">
+              <ConnectButton />
             </div>
-          ) : null}
-        </div>
-      </header>
-      <main className={styles.module}>
-        <Particles
-          id="tsparticles"
-          init={particlesInit}
-          loaded={particlesLoaded}
-          options={particlesOpt}
-        />
-        <div className={styles.content}>
-          <div className={styles.column1}>
-            <BasicPannel
-              owner={owner}
-              data={projectTaskDTO}
-              taskInstance={actionTaskInstance}
-              projectTaskId={id}
-              shareId={shareId}
-              isSecurity={isSecurity}
-              queryProjectTaskStatus={queryProjectTaskStatus}
-            />
-            <DescPannel data={projectTaskDTO} />
+            {!isMobile ? (
+              <div
+                id="detail-create-adventure-button"
+                className={styles.create}
+                onClick={() => navigate('/backend/create')}
+              >
+                <PlusOutlined style={{ marginRight: '8px' }} />
+                New Adventure
+              </div>
+            ) : null}
           </div>
-          <div className={styles.column2}>
-            <RewardPannel data={projectTaskDTO} cpa={cpaTaskInstance} action={actionTaskStatus} />
+        </header>
+        <main className={styles.module}>
+          <Particles
+            id="tsparticles"
+            init={particlesInit}
+            loaded={particlesLoaded}
+            options={particlesOpt}
+          />
+          <div className={styles.content}>
+            <div className={styles.column1}>
+              <BasicPannel
+                owner={owner}
+                data={projectTaskDTO}
+                taskInstance={actionTaskInstance}
+                projectTaskId={id}
+                shareId={shareId}
+                isSecurity={isSecurity}
+                queryProjectTaskStatus={queryProjectTaskStatus}
+              />
+              <DescPannel data={projectTaskDTO} />
+            </div>
+            <div className={styles.column2}>
+              <RewardPannel data={projectTaskDTO} cpa={cpaTaskInstance} action={actionTaskStatus} />
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </Observer>
   )
 }
 
