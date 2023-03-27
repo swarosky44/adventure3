@@ -123,7 +123,27 @@ const Detail = () => {
     >
       <div className={styles.page} id="detail-homepage">
         <header className={styles.header}>
-          <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
+          <Observer
+            onChange={() => {
+              window.dataLayer.push({
+                event: 'lp-homelogo-expose',
+                address: address || '',
+                projectId: id
+              })
+            }}
+          >
+            <img
+              className={styles.logo}
+              src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png"
+              onClick={() => {
+                window.dataLayer.push({
+                  event: 'lp-homelogo-clk',
+                  addrss: address || '',
+                  projectId: id
+                })
+              }}
+            />
+          </Observer>
           <div className={styles.right}>
             <div id="detail-connect-button">
               <ConnectButton />

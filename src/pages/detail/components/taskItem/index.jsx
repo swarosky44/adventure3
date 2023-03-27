@@ -1,6 +1,7 @@
 import { message } from 'antd'
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
+import Observer from '@researchgate/react-intersection-observer'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { request } from '@/utils/request'
 import styles from './index.module.less'
@@ -76,46 +77,65 @@ export default ({
   }
 
   return (
-    <div className={styles.task} key={`task-${index}`} id={`detail-task-${item.taskType}-card`}>
-      <div className={styles.taskContent} onClick={open}>
-        <img className={styles.taskIcon} src={switchTaskIcon()} />
-        <span className={styles.taskText}>{item.name || ''}</span>
-        {item.status === 'finish' ? (
-          <img
-            className={styles.compeletedIcon}
-            src="https://db35z3hw6fbxp.cloudfront.net/complete-icon.png"
-          />
-        ) : null}
-      </div>
-      {operaVisible ? (
-        <div className={styles.taskOperaPannel}>
-          {item.taskType.indexOf('Custom') >= 0 ? (
-            <div className={styles.taskTip}>
-              <div className={styles.taskTipTitle}>Website</div>
-              <div className={styles.taskTargetUrl}>https://tokendance.xyz/bat</div>
-            </div>
+    <Observer
+      onChange={() => {
+        window.dataLayer.push({
+          event: 'lp-taskitem-expose',
+          address: address || '',
+          projectId: projectTaskId || '',
+          taskType: item.taskType || '',
+          actionId: item.actionTaskId || ''
+        })
+      }}
+    >
+      <div className={styles.task} key={`task-${index}`}>
+        <div
+          className={styles.taskContent}
+          onClick={() => {
+            window.dataLayer.push({
+              event: 'lp-taskitem-clk',
+              address: address || '',
+              projectId: projectTaskId || '',
+              taskType: item.taskType || '',
+              actionId: item.actionTaskId || ''
+            })
+            open()
+          }}
+        >
+          <img className={styles.taskIcon} src={switchTaskIcon()} />
+          <span className={styles.taskText}>{item.name || ''}</span>
+          {item.status === 'finish' ? (
+            <img
+              className={styles.compeletedIcon}
+              src="https://db35z3hw6fbxp.cloudfront.net/complete-icon.png"
+            />
           ) : null}
-          <div className={styles.taskBtns}>
-            <div
-              id={`detail-task-${item.taskType}-do-button`}
-              className={styles.doBtn}
-              onClick={() => {
-                localStorage.setItem(`${item.actionTaskId}-${item.name}`, 1)
-                window.open(item.actionObject)
-              }}
-            >
-              GO
-            </div>
-            <div
-              id={`detail-task-${item.taskType}-verify-button`}
-              className={styles.verifyBtn}
-              onClick={onFinish}
-            >
-              {loading ? 'Loading ...' : 'Verify'}
+        </div>
+        {operaVisible ? (
+          <div className={styles.taskOperaPannel}>
+            {item.taskType.indexOf('Custom') >= 0 ? (
+              <div className={styles.taskTip}>
+                <div className={styles.taskTipTitle}>Website</div>
+                <div className={styles.taskTargetUrl}>https://tokendance.xyz/bat</div>
+              </div>
+            ) : null}
+            <div className={styles.taskBtns}>
+              <div
+                className={styles.doBtn}
+                onClick={() => {
+                  localStorage.setItem(`${item.actionTaskId}-${item.name}`, 1)
+                  window.open(item.actionObject)
+                }}
+              >
+                GO
+              </div>
+              <div className={styles.verifyBtn} onClick={onFinish}>
+                {loading ? 'Loading ...' : 'Verify'}
+              </div>
             </div>
           </div>
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+    </Observer>
   )
 }
