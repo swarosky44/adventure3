@@ -71,6 +71,12 @@ export default ({
       setTimeout(() => {
         setLoading(false)
       }, 1000)
+      window.dataLayer.push({
+        event: 'lp-taskitem-verify-success-clk',
+        projectId: projectTaskId || '',
+        taskType: item.taskType || '',
+        actionId: item.actionTaskId || ''
+      })
     } else if (ret && ret.message) {
       message.warning(ret.message)
     }
@@ -120,18 +126,57 @@ export default ({
               </div>
             ) : null}
             <div className={styles.taskBtns}>
-              <div
-                className={styles.doBtn}
-                onClick={() => {
-                  localStorage.setItem(`${item.actionTaskId}-${item.name}`, 1)
-                  window.open(item.actionObject)
+              <Observer
+                onChange={() => {
+                  window.dataLayer.push({
+                    event: 'lp-taskitem-go-expose',
+                    projectId: projectTaskId || '',
+                    taskType: item.taskType || '',
+                    actionId: item.actionTaskId || ''
+                  })
                 }}
               >
-                GO
-              </div>
-              <div className={styles.verifyBtn} onClick={onFinish}>
-                {loading ? 'Loading ...' : 'Verify'}
-              </div>
+                <div
+                  className={styles.doBtn}
+                  onClick={() => {
+                    window.dataLayer.push({
+                      event: 'lp-taskitem-go-clk',
+                      projectId: projectTaskId || '',
+                      taskType: item.taskType || '',
+                      actionId: item.actionTaskId || ''
+                    })
+                    localStorage.setItem(`${item.actionTaskId}-${item.name}`, 1)
+                    window.open(item.actionObject)
+                  }}
+                >
+                  GO
+                </div>
+              </Observer>
+              <Observer
+                onChange={() => {
+                  window.dataLayer.push({
+                    event: 'lp-taskitem-verify-expose',
+                    projectId: projectTaskId || '',
+                    taskType: item.taskType || '',
+                    actionId: item.actionTaskId || ''
+                  })
+                }}
+              >
+                <div
+                  className={styles.verifyBtn}
+                  onClick={() => {
+                    window.dataLayer.push({
+                      event: 'lp-taskitem-verify-clk',
+                      projectId: projectTaskId || '',
+                      taskType: item.taskType || '',
+                      actionId: item.actionTaskId || ''
+                    })
+                    onFinish()
+                  }}
+                >
+                  {loading ? 'Loading ...' : 'Verify'}
+                </div>
+              </Observer>
             </div>
           </div>
         ) : null}
