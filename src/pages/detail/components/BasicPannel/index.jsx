@@ -2,6 +2,7 @@ import { message } from 'antd'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
+import Observer from '@researchgate/react-intersection-observer'
 import { useAccount } from 'wagmi'
 import { request } from '@/utils/request'
 import Task from '../taskItem'
@@ -116,29 +117,49 @@ export default ({
           )
         })}
         {shareCode ? (
-          <div className={styles.task} id="detail-task-share-card">
-            <div className={styles.taskContent} onClick={() => setOperaVisible((v) => !v)}>
-              <img
-                className={styles.taskIcon}
-                src="https://db35z3hw6fbxp.cloudfront.net/custom-icon.png"
-              />
-              <span className={styles.taskText}>Publish content to bring in users</span>
-            </div>
-            {operaVisible ? (
-              <div className={styles.taskOperaPannel} id="detail-task-share-copy-button">
-                <div className={styles.taskBtns}>
-                  <CopyToClipboard
-                    text={`https://www.adventure3.tk/detail?id=${projectTaskId}&shareId=${shareCode}`}
-                    onCopy={() =>
-                      message.success('Create success! Publish Content to birng in users')
-                    }
-                  >
-                    <div className={styles.doBtn}>COPY URL</div>
-                  </CopyToClipboard>
-                </div>
+          <Observer
+            onChange={() => {
+              window.dataLayer.push({
+                event: 'lp-shareitem-expose',
+                address: address || '',
+                projectId: projectTaskId || ''
+              })
+            }}
+          >
+            <div className={styles.task} id="detail-task-share-card">
+              <div
+                className={styles.taskContent}
+                onClick={() => {
+                  window.dataLayer.push({
+                    event: 'lp-shareitem-clk',
+                    address: address || '',
+                    projectId: projectTaskId || ''
+                  })
+                  setOperaVisible((v) => !v)
+                }}
+              >
+                <img
+                  className={styles.taskIcon}
+                  src="https://db35z3hw6fbxp.cloudfront.net/custom-icon.png"
+                />
+                <span className={styles.taskText}>Publish content to bring in users</span>
               </div>
-            ) : null}
-          </div>
+              {operaVisible ? (
+                <div className={styles.taskOperaPannel} id="detail-task-share-copy-button">
+                  <div className={styles.taskBtns}>
+                    <CopyToClipboard
+                      text={`https://www.adventure3.tk/detail?id=${projectTaskId}&shareId=${shareCode}`}
+                      onCopy={() =>
+                        message.success('Create success! Publish Content to birng in users')
+                      }
+                    >
+                      <div className={styles.doBtn}>COPY URL</div>
+                    </CopyToClipboard>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </Observer>
         ) : null}
       </div>
     </div>
