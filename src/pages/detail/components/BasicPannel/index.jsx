@@ -145,18 +145,33 @@ export default ({
                 <span className={styles.taskText}>Publish content to bring in users</span>
               </div>
               {operaVisible ? (
-                <div className={styles.taskOperaPannel} id="detail-task-share-copy-button">
-                  <div className={styles.taskBtns}>
-                    <CopyToClipboard
-                      text={`https://www.adventure3.tk/detail?id=${projectTaskId}&shareId=${shareCode}`}
-                      onCopy={() =>
-                        message.success('Create success! Publish Content to birng in users')
-                      }
-                    >
-                      <div className={styles.doBtn}>COPY URL</div>
-                    </CopyToClipboard>
+                <Observer
+                  onChange={() => {
+                    window.dataLayer.push({
+                      event: 'lp-shareitem-copy-expose',
+                      address: address || '',
+                      projectId: projectTaskId || ''
+                    })
+                  }}
+                >
+                  <div className={styles.taskOperaPannel} id="detail-task-share-copy-button">
+                    <div className={styles.taskBtns}>
+                      <CopyToClipboard
+                        text={`https://www.adventure3.tk/detail?id=${projectTaskId}&shareId=${shareCode}`}
+                        onCopy={() => {
+                          window.dataLayer.push({
+                            event: 'lp-shareitem-copy-clk',
+                            address: address || '',
+                            projectId: projectTaskId || ''
+                          })
+                          message.success('Create success! Publish Content to birng in users')
+                        }}
+                      >
+                        <div className={styles.doBtn}>COPY URL</div>
+                      </CopyToClipboard>
+                    </div>
                   </div>
-                </div>
+                </Observer>
               ) : null}
             </div>
           </Observer>
