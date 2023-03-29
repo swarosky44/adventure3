@@ -3,6 +3,7 @@ import { Form, Input, Upload, Button, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
+import Observer from '@researchgate/react-intersection-observer'
 import { request } from '@/utils/request'
 import styles from './index.module.less'
 
@@ -125,120 +126,129 @@ const BasicForm = ({ setCurrent = () => {} }) => {
   }, [address])
 
   return (
-    <div className={styles.comp}>
-      <Form
-        name="basic-form"
-        className={styles.form}
-        layout="vertical"
-        form={form}
-        onFinish={onSubmit}
-      >
-        <Form.Item
-          name="name"
-          label="项目名称"
-          required
-          rules={[{ validator: checkCommutityName }]}
-          hasFeedback
+    <Observer
+      onChange={() => {
+        window.dataLayer.push({
+          event: 'backend-step1-form-expose',
+          address: address || ''
+        })
+      }}
+    >
+      <div className={styles.comp}>
+        <Form
+          name="basic-form"
+          className={styles.form}
+          layout="vertical"
+          form={form}
+          onFinish={onSubmit}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item name="logo" label="项目LOGO" required valuePropName="file" hasFeedback>
-          <Upload
-            name="file"
-            accept="image/*"
-            action="https://www.adventure3.tk/api/file/upload"
-            listType="picture-card"
-            fileList={fileList}
-            headers={{
-              authorization: 'authorization-text'
-            }}
-            beforeUpload={(file) => {
-              const isJPG = file.type === 'image/jpeg'
-              const isPNG = file.type === 'image/png'
-              const isBMP = file.type === 'image/bmp'
-              const isGIF = file.type === 'image/gif'
-              const isWEBP = file.type === 'image/webp'
-              const isPic = isJPG || isPNG || isBMP || isGIF || isWEBP
-              if (isPic) {
-                return true
-              }
-              return false
-            }}
-            onChange={(info) => {
-              const { fileList } = info
-              if (info.file.status === 'done') {
-                const { response } = info.file
-                const { result } = response
-                form.setFieldValue('logo', result)
-                setFileList(fileList.map((f) => ({ ...f, onlineUrl: result })))
-                message.success('上传成功')
-              } else {
-                setFileList(fileList)
-              }
-            }}
-            onPreview={(file) => {
-              window.open(
-                file.onlineUrl.indexOf('https') >= 0
-                  ? file.onlineUrl
-                  : `https://db35z3hw6fbxp.cloudfront.net/${file.onlineUrl}`
-              )
-            }}
+          <Form.Item
+            name="name"
+            label="项目名称"
+            required
+            rules={[{ validator: checkCommutityName }]}
+            hasFeedback
           >
-            {fileList.length < 1 ? (
-              <div>
-                <PlusOutlined />
-                <div style={{ marginTop: 8 }}>上传图片</div>
-              </div>
-            ) : null}
-          </Upload>
-        </Form.Item>
-        <Form.Item
-          name="owner"
-          label="项目负责人"
-          rules={[{ required: true, message: '项目负责人不能为空' }]}
-          hasFeedback
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="contractAddress"
-          label="智能合约地址"
-          required
-          rules={[{ validator: checkCommutityContract }]}
-          hasFeedback
-        >
-          <Input addonBefore="Ethereum" />
-        </Form.Item>
-        <Form.Item
-          name="officialWebsite"
-          label="项目官网"
-          rules={[{ required: true, message: '项目官网不能为空' }]}
-          hasFeedback
-        >
-          <Input addonBefore="https://" />
-        </Form.Item>
-        <Form.Item name="whitePaper" label="项目白皮书">
-          <Input />
-        </Form.Item>
-        <Form.Item name="tags" label="项目标签">
-          <Input />
-        </Form.Item>
-        <Form.Item name="githubAddress" label="github地址">
-          <Input />
-        </Form.Item>
-        <Form.Item name="investmentInstitutions" label="项目投资方">
-          <Input />
-        </Form.Item>
-        <Form.Item name="methodId" label="methodId">
-          <Input />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            保存
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+            <Input />
+          </Form.Item>
+          <Form.Item name="logo" label="项目LOGO" required valuePropName="file" hasFeedback>
+            <Upload
+              name="file"
+              accept="image/*"
+              action="https://www.adventure3.tk/api/file/upload"
+              listType="picture-card"
+              fileList={fileList}
+              headers={{
+                authorization: 'authorization-text'
+              }}
+              beforeUpload={(file) => {
+                const isJPG = file.type === 'image/jpeg'
+                const isPNG = file.type === 'image/png'
+                const isBMP = file.type === 'image/bmp'
+                const isGIF = file.type === 'image/gif'
+                const isWEBP = file.type === 'image/webp'
+                const isPic = isJPG || isPNG || isBMP || isGIF || isWEBP
+                if (isPic) {
+                  return true
+                }
+                return false
+              }}
+              onChange={(info) => {
+                const { fileList } = info
+                if (info.file.status === 'done') {
+                  const { response } = info.file
+                  const { result } = response
+                  form.setFieldValue('logo', result)
+                  setFileList(fileList.map((f) => ({ ...f, onlineUrl: result })))
+                  message.success('上传成功')
+                } else {
+                  setFileList(fileList)
+                }
+              }}
+              onPreview={(file) => {
+                window.open(
+                  file.onlineUrl.indexOf('https') >= 0
+                    ? file.onlineUrl
+                    : `https://db35z3hw6fbxp.cloudfront.net/${file.onlineUrl}`
+                )
+              }}
+            >
+              {fileList.length < 1 ? (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>上传图片</div>
+                </div>
+              ) : null}
+            </Upload>
+          </Form.Item>
+          <Form.Item
+            name="owner"
+            label="项目负责人"
+            rules={[{ required: true, message: '项目负责人不能为空' }]}
+            hasFeedback
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="contractAddress"
+            label="智能合约地址"
+            required
+            rules={[{ validator: checkCommutityContract }]}
+            hasFeedback
+          >
+            <Input addonBefore="Ethereum" />
+          </Form.Item>
+          <Form.Item
+            name="officialWebsite"
+            label="项目官网"
+            rules={[{ required: true, message: '项目官网不能为空' }]}
+            hasFeedback
+          >
+            <Input addonBefore="https://" />
+          </Form.Item>
+          <Form.Item name="whitePaper" label="项目白皮书">
+            <Input />
+          </Form.Item>
+          <Form.Item name="tags" label="项目标签">
+            <Input />
+          </Form.Item>
+          <Form.Item name="githubAddress" label="github地址">
+            <Input />
+          </Form.Item>
+          <Form.Item name="investmentInstitutions" label="项目投资方">
+            <Input />
+          </Form.Item>
+          <Form.Item name="methodId" label="methodId">
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              保存
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </Observer>
   )
 }
 

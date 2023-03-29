@@ -7,6 +7,7 @@ import { useAccount, useSigner } from 'wagmi'
 import { Space, Table, Result, notification } from 'antd'
 import { ethers } from 'ethers'
 import dayjs from 'dayjs'
+import Observer from '@researchgate/react-intersection-observer'
 import CampaignAbi from '@/utils/Campaign.json'
 import { request, getCurrentGasPrice } from '@/utils/request'
 import styles from './index.module.less'
@@ -299,35 +300,44 @@ const Profile = () => {
   }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
-        <div className={styles.right}>
-          <ConnectButton />
-          {!isMobile ? (
-            <div className={styles.create} onClick={() => navigate('/backend/create')}>
-              <PlusOutlined style={{ marginRight: '8px' }} />
-              New Adventure
-            </div>
-          ) : null}
-        </div>
-      </header>
-      <main className={styles.main}>
-        <div className={styles.tableWrapper}>
-          <div className={styles.categoryTitle}>TASK DETAILS</div>
-          <Table
-            style={{ marginTop: '16px' }}
-            columns={columns}
-            rowKey={(record) => record.id}
-            dataSource={data}
-            pagination={tableParams.pagination}
-            loading={loading}
-            onChange={handleTableChange}
-            bordered={true}
-          />
-        </div>
-      </main>
-    </div>
+    <Observer
+      onChange={() => {
+        window.dataLayer.push({
+          event: 'profile-expose',
+          address: address || ''
+        })
+      }}
+    >
+      <div className={styles.page}>
+        <header className={styles.header}>
+          <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png" />
+          <div className={styles.right}>
+            <ConnectButton />
+            {!isMobile ? (
+              <div className={styles.create} onClick={() => navigate('/backend/create')}>
+                <PlusOutlined style={{ marginRight: '8px' }} />
+                New Adventure
+              </div>
+            ) : null}
+          </div>
+        </header>
+        <main className={styles.main}>
+          <div className={styles.tableWrapper}>
+            <div className={styles.categoryTitle}>TASK DETAILS</div>
+            <Table
+              style={{ marginTop: '16px' }}
+              columns={columns}
+              rowKey={(record) => record.id}
+              dataSource={data}
+              pagination={tableParams.pagination}
+              loading={loading}
+              onChange={handleTableChange}
+              bordered={true}
+            />
+          </div>
+        </main>
+      </div>
+    </Observer>
   )
 }
 
