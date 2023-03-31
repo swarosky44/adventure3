@@ -37,15 +37,19 @@ const routesConfig = createBrowserRouter([
       }
     ]
   },
+  {
+    //  create a route /profile
+    path: '/profile',
+    element: <Profile />
+  },
   // 内部使用
   {
     path: '/encrypto',
     element: <EncryptoCampaign />
   },
   {
-    //  create a route /profile
-    path: '/profile',
-    element: <Profile />
+    path: '/',
+    element: <Home />
   }
 ])
 
