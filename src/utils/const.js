@@ -17,21 +17,21 @@ export const ENV =
     ? 'test'
     : window.location.search.indexOf('env=daily') >= 0
     ? 'daily'
-    : 'test'
+    : 'prod'
 
 export const AD3HUB_ADDRESS =
   ENV === 'test'
     ? '0xeCD374aB5EF4D1CDcB53977d9051EaEFdEf314b9'
     : ENV === 'daily'
     ? '0x5FbDB2315678afecb367f032d93F642f64180aa3'
-    : '0xeCD374aB5EF4D1CDcB53977d9051EaEFdEf314b9'
+    : '0x47083DA196Ec7a59b096F8E02b8827a105c20477'
 
 export const USDT_TOKEN_ADDRESS =
   ENV === 'test'
     ? '0x1896E1331FCb0DDd76086aadF797A09fFea5EA46'
     : ENV === 'daily'
     ? '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
-    : '0x1896E1331FCb0DDd76086aadF797A09fFea5EA46'
+    : '0xc2132D05D31c914a87C6611C10748AEb04B58e8F'
 
 export const ALCHEMY_PRIVATE_KEY =
   ENV === 'test' ? ALCHEMY_MUMBAI_AD3_PRIVATE_KEY : ALCHEMY_POLYGON_AD3_PRIVATE_KEY
