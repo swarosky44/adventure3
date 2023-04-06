@@ -134,13 +134,14 @@ const Detail = () => {
           >
             <img
               className={styles.logo}
-              src="https://db35z3hw6fbxp.cloudfront.net/detail-logo.png"
+              src="https://db35z3hw6fbxp.cloudfront.net/Group+789.png"
               onClick={() => {
                 window.dataLayer.push({
                   event: 'lp-homelogo-clk',
                   addrss: address || '',
                   projectId: id
                 })
+                navigate('/')
               }}
             />
           </Observer>

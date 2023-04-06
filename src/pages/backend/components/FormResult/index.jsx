@@ -1,7 +1,10 @@
 import { Button, Result, QRCode, Popover } from 'antd'
+import { useNavigate } from 'react-router'
 
-const FormResult = ({ data = null, setCurrent = () => {} }) => {
+const FormResult = ({ data = {}, setCurrent = () => {} }) => {
   const { result } = data
+  const navigate = useNavigate()
+  const id = result || '140'
 
   return (
     <div className="comp">
@@ -11,11 +14,7 @@ const FormResult = ({ data = null, setCurrent = () => {} }) => {
         subTitle="已生成活动页面，访问方式如下"
         extra={[
           <Button type="primary" key="link">
-            <a
-              target="_blank"
-              href={`https://www.adventure3.tk/detail?id=${result}`}
-              style={{ color: '#fff' }}
-            >
+            <a style={{ color: '#fff' }} onClick={() => navigate(`/detail?id=${id}`)}>
               访问 PC 页面
             </a>
           </Button>,
@@ -25,8 +24,8 @@ const FormResult = ({ data = null, setCurrent = () => {} }) => {
             content={
               <QRCode
                 errorLevel="H"
-                value={`https://www.adventure3.tk/detail?id=${result}`}
-                icon="https://db35z3hw6fbxp.cloudfront.net/ad3_logo.png"
+                value={`https://www.adventure3.tk/detail?id=${id}`}
+                icon="https://db35z3hw6fbxp.cloudfront.net/Group+789.png"
               />
             }
           >
@@ -36,11 +35,7 @@ const FormResult = ({ data = null, setCurrent = () => {} }) => {
             重新创建
           </Button>,
           <Button key="detail">
-            <a
-              target="_blank"
-              href={`https://www.adventure3.tk/backend/detail?id=${result}`}
-              style={{ color: '#333' }}
-            >
+            <a style={{ color: '#333' }} onClick={() => navigate(`/backend/detail?id=${id}`)}>
               任务详情
             </a>
           </Button>

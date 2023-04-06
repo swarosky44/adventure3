@@ -5,12 +5,16 @@ import { PlusOutlined } from '@ant-design/icons'
 import styles from './index.module.less'
 
 const BasicLayout = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <img className={styles.logo} src="https://db35z3hw6fbxp.cloudfront.net/ad3_logo.png" />
+        <img
+          className={styles.logo}
+          src="https://db35z3hw6fbxp.cloudfront.net/Group+789.png"
+          onClick={() => navigate('/')}
+        />
         <div className={styles.right}>
           <ConnectButton />
           {!isMobile ? (
