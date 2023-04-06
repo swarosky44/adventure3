@@ -9,26 +9,36 @@ export default () => {
         whileInView={{ opacity: 1 }}
         transition={{ type: 'easeOut', duration: 0.5 }}
       >
-        <img className={styles.brands} src="https://db35z3hw6fbxp.cloudfront.net/Group+796.png" />
+        <img className={styles.brands} src="https://db35z3hw6fbxp.cloudfront.net/Group+850.png" />
       </motion.div>
       <div className={styles.panel}>
         <div className={styles.title}>
-          <p>Ready to</p>
-          <p>get it</p>
-          <p>started?</p>
+          <p>Start</p>
+          <p>your AD3</p>
+          <p>Journey</p>
         </div>
         <div className={styles.content}>
           <p>
-            Explore <a>Whitepaper</a> or
+            <img src="https://db35z3hw6fbxp.cloudfront.net/Group+847.png" />
+            Explore{' '}
+            <a target="_blank" href="https://ad3s-organization.gitbook.io/ad3-whitepaper/">
+              Whitepaper
+            </a>{' '}
+            or
           </p>
           <p>
-            {' '}
-            join our <a>community</a>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+796-1.png" />
+            join our{' '}
+            <a target="_blank" href="https://twitter.com/AdalynAlli92877">
+              community
+            </a>
           </p>
           <p>
-            You can also contact us to <a>become our Partner</a>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+797.png" />
+            You can also contact us to{' '}
+            <a target="_blank" href="https://t.me/+oD5ACHb-e7tiMDdl">
+              become our Partner
+            </a>
           </p>
         </div>
         <motion.div
@@ -47,7 +57,13 @@ export default () => {
           whileInView={{ y: 0 }}
           transition={{ type: 'easeOut', delay: 1, duration: 0.5 }}
         >
-          Book a Demo
+          <a
+            style={{ color: '#333', textDecoration: 'none' }}
+            target="_blank"
+            href="https://forms.gle/3QbvvQfnKfpWqVrJ7"
+          >
+            Book a Demo
+          </a>
         </motion.div>
       </div>
     </section>

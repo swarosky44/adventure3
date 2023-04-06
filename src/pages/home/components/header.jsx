@@ -32,8 +32,8 @@ export default () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ type: 'easeOut', delay: 1 }}
         >
-          <p>Connect billions of Web3 users</p>
-          <p>to millions of Web3 brands</p>
+          <p>Connect billions of Web3 users to</p>
+          <p>millions of brands in Web3</p>
         </motion.div>
         <div className={styles.mainPic}>
           <motion.div
@@ -64,7 +64,13 @@ export default () => {
         </div>
         <div className={styles.nav}>
           <a className={styles.navItem}>Home</a>
-          <a className={styles.navItem}>Whitepaper</a>
+          <a
+            className={styles.navItem}
+            target="_blank"
+            href="https://ad3s-organization.gitbook.io/ad3-whitepaper/"
+          >
+            Whitepaper
+          </a>
           <a className={styles.hoverItem}>Launch App</a>
         </div>
         <div className={styles.book}>
@@ -79,7 +85,9 @@ export default () => {
               src="data:image/png;base64,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"
             />
           </motion.div>
-          <div className={styles.bookBtn}>Book a Demo</div>
+          <a className={styles.bookBtn} target="_blank" href="https://forms.gle/3QbvvQfnKfpWqVrJ7">
+            Book a Demo
+          </a>
         </div>
       </div>
     </header>
