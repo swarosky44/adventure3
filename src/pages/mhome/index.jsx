@@ -91,7 +91,7 @@ export default () => {
           <div className={styles.content}>
             <img
               style={{ width: '40vw', height: '38.7vw', marginBottom: '11vw' }}
-              src="https://db35z3hw6fbxp.cloudfront.net/Group+767.png"
+              src="https://db35z3hw6fbxp.cloudfront.net/Group+762.png"
             />
             <h3 style={{ margin: 0, marginBottom: '3.2vw' }}>
               <p className={styles.main}>Seamless tracking Services</p>
