@@ -1,8 +1,10 @@
 import loadable from '@loadable/component'
 import { createBrowserRouter } from 'react-router-dom'
+import { isMobile } from 'react-device-detect'
 import BasicLayout from '@/layouts/basic'
 
 const Home = loadable(() => import('@/pages/home'))
+const MHome = loadable(() => import('@/pages/mhome'))
 const Detail = loadable(() => import('@/pages/detail'))
 const Backend = loadable(() => import('@/pages/backend'))
 const BackendList = loadable(() => import('@/pages/backendList'))
@@ -30,10 +32,6 @@ const routesConfig = createBrowserRouter([
       {
         path: 'create',
         element: <Backend />
-      },
-      {
-        index: true,
-        element: <Home />
       }
     ]
   },
@@ -49,7 +47,7 @@ const routesConfig = createBrowserRouter([
   },
   {
     path: '/',
-    element: <Home />
+    element: isMobile ? <MHome /> : <Home />
   }
 ])
 

@@ -29,7 +29,7 @@ export default () => {
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+796-1.png" />
             join our{' '}
-            <a target="_blank" href="https://twitter.com/AdalynAlli92877">
+            <a target="_blank" href="https://twitter.com/ad3_protocol">
               community
             </a>
           </p>
