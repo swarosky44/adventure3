@@ -4,7 +4,7 @@ export default () => {
   return (
     <div className={styles.task}>
       <div className={styles.title}>
-        <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+767.png" />
+        <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+767-1.png" />
         <h2 className={styles.text}>Unique Task model</h2>
       </div>
       <div className={styles.tasks}>

@@ -48,7 +48,7 @@ export default () => {
           whileInView={{ y: 0, rotate: 0 }}
           transition={{ type: 'easeOut', delay: 1, duration: 0.5 }}
         >
-          <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+767.png" />
+          <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+767-1.png" />
         </motion.div>
 
         <motion.div

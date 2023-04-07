@@ -63,8 +63,7 @@ export default () => {
               src="https://db35z3hw6fbxp.cloudfront.net/Group+831.png"
             />
             <h3 style={{ margin: 0, marginBottom: '3.2vw' }}>
-              <p className={styles.main}>Specialize in developing</p>
-              <p className={styles.main}>marketing tasks</p>
+              <p className={styles.main}>Specialize in developing marketing tasks</p>
             </h3>
             <p className={styles.sub}>Create a marketing campaign with different task</p>
             <p className={styles.sub}>templates quickly base on your marketing goals.</p>
@@ -104,7 +103,7 @@ export default () => {
       </section>
       <section className={styles.task}>
         <h2 className={styles.title}>
-          <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+767.png" />
+          <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+767-1.png" />
           <p className={styles.text}>Unique Task model</p>
         </h2>
         <div className={styles.taskItem}>
