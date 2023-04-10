@@ -29,7 +29,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://www.adventure3.tk',
+        target: 'http://ad3.app',
         changeOrigin: true,
         secure: false
       }
