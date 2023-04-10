@@ -151,15 +151,13 @@ export default ({ data = {}, cpa = {}, action = {} }) => {
         <div className={styles.cardLineCountdown}>{renderCountdown()}</div>
         <div className={styles.cardLine}>
           <div className={styles.lineLable}>Token Budget</div>
-          <img className={styles.lineIcon} src="https://db35z3hw6fbxp.cloudfront.net/tokens.png" />
-          <div className={styles.lineValue}>{data.actionTaskRewardNum}</div>
+          <img className={styles.lineIcon} src={renderTokenIcon(data.actionTaskRewardUnit)} />
+          <div className={styles.lineValue}>{data.actionTaskRewardBudget}</div>
           <div className={styles.lineUnit}>{data.actionTaskRewardUnit}</div>
         </div>
         <div className={styles.cardLine} style={{ border: 'none' }}>
           <div className={styles.lineLable}>Total Point</div>
-          <img className={styles.lineIcon} src="https://db35z3hw6fbxp.cloudfront.net/tokens.png" />
-          <div className={styles.lineValue}>{data.actionTaskRewardBudget}</div>
-          <div className={styles.lineUnit}>{data.actionTaskRewardUnit}</div>
+          <div className={styles.lineValue}>{data.actionTaskRewardNum}</div>
         </div>
       </div>
       <div className={styles.adventure}>
