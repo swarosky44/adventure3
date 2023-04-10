@@ -1,11 +1,18 @@
+import { useState } from 'react'
 import styles from './index.module.less'
 
 export default () => {
+  const [isShowModal, setIsShowModal] = useState(false)
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <div className={styles.menu}>
-          <img className={styles.menuIcon} src="https://db35z3hw6fbxp.cloudfront.net/menu.png" />
+          <img
+            className={styles.menuIcon}
+            onClick={() => setIsShowModal(true)}
+            src="https://db35z3hw6fbxp.cloudfront.net/menu.png"
+          />
         </div>
       </header>
       <section className={styles.top}>
@@ -29,7 +36,9 @@ export default () => {
           </div>
 
           <div className={styles.book}>
-            <a className={styles.bookBtn}>Book a Demo</a>
+            <a className={styles.bookBtn} href="https://forms.gle/3QbvvQfnKfpWqVrJ7">
+              Book a Demo
+            </a>
           </div>
         </div>
       </section>
@@ -161,25 +170,16 @@ export default () => {
           <h2 className={styles.title}>Start your AD3 Journey</h2>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+847.png" />
-            Explore{' '}
-            <a target="_blank" href="https://ad3s-organization.gitbook.io/ad3-whitepaper/">
-              Whitepaper
-            </a>{' '}
-            or
+            Explore <a href="https://ad3s-organization.gitbook.io/ad3-whitepaper/">Whitepaper</a> or
           </p>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+796-1.png" />
-            join our{' '}
-            <a target="_blank" href="https://twitter.com/ad3_protocol">
-              community
-            </a>
+            join our <a href="https://twitter.com/ad3_protocol">community</a>
           </p>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+797.png" />
             You can also
-            <a target="_blank" href="https://t.me/+oD5ACHb-e7tiMDdl">
-              contact us
-            </a>
+            <a href="https://t.me/+oD5ACHb-e7tiMDdl">contact us</a>
             to
           </p>
           <p style={{ paddingLeft: '8.6vw' }}>become our Partner</p>
@@ -198,6 +198,42 @@ export default () => {
       <section className={styles.bottom}>
         <div className={styles.line} />
         <p>Copyright © 2023 • AD3</p>
+      </section>
+      <section
+        className={styles.modal}
+        style={{
+          transform: `translate3d(${isShowModal ? 0 : 50}vw, 0, 0)`,
+          opacity: isShowModal ? 1 : 0.2
+        }}
+        onClick={() => setIsShowModal(false)}
+      >
+        <div
+          className={styles.menu}
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        >
+          <a className={styles.menuItem}>Home</a>
+          <a
+            className={styles.menuItem}
+            href="https://ad3s-organization.gitbook.io/ad3-whitepaper/"
+          >
+            Whitepaper
+          </a>
+          <a className={styles.menuItem}>
+            <span>Book a Demo</span>
+            <img src="https://db35z3hw6fbxp.cloudfront.net/M+Arrow+3.png" />
+          </a>
+        </div>
+        <div className={styles.line} />
+        <a className={styles.launch}>
+          <img
+            className={styles.launchBtn}
+            src="https://db35z3hw6fbxp.cloudfront.net/M+Group+823.png"
+          />
+          <span style={{ color: 'rgba(255, 255, 255, .2)' }}>Launch soon</span>
+        </a>
+        <img className={styles.close} src="https://db35z3hw6fbxp.cloudfront.net/Variant3.png" />
       </section>
     </div>
   )
