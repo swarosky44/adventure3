@@ -9,6 +9,7 @@ export default () => {
         whileInView={{ opacity: 1 }}
         transition={{ type: 'easeOut', duration: 0.5 }}
       >
+        <h2 className={styles.brandsTitle}>Trusted by brands & communities</h2>
         <img className={styles.brands} src="https://db35z3hw6fbxp.cloudfront.net/Group+850.png" />
       </motion.div>
       <div className={styles.panel}>
@@ -24,20 +25,19 @@ export default () => {
             <a target="_blank" href="https://ad3s-organization.gitbook.io/ad3-whitepaper/">
               Whitepaper
             </a>{' '}
-            or
           </p>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+796-1.png" />
-            join our{' '}
+            Join our{' '}
             <a target="_blank" href="https://twitter.com/ad3_protocol">
               community
             </a>
           </p>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+797.png" />
-            You can also contact us to{' '}
+            Contact us to{' '}
             <a target="_blank" href="https://t.me/+oD5ACHb-e7tiMDdl">
-              become our Partner
+              become a Partner
             </a>
           </p>
         </div>

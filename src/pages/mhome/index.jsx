@@ -79,7 +79,7 @@ export default () => {
           </div>
         </div>
         <div className={styles.panel}>
-          <h3 className={styles.panelTitle}>Task Collaboration</h3>
+          <h3 className={styles.panelTitle}>Distribute Tasks</h3>
           <div className={styles.line} />
           <div className={styles.content}>
             <img
@@ -89,9 +89,9 @@ export default () => {
             <h3 style={{ margin: 0, marginBottom: '3.2vw' }}>
               <p className={styles.main}>Social Media Networking</p>
             </h3>
-            <p className={styles.sub}>Unleash the true power of social media networking</p>
-            <p className={styles.sub}>by sharing tasks on your own social media profiles</p>
-            <p className={styles.sub}>and earning greater rewards.</p>
+            <p className={styles.sub}>Unleash the true power of social media networks by</p>
+            <p className={styles.sub}>sharing tasks on your own social media profiles</p>
+            <p className={styles.sub}>and engaging users.</p>
           </div>
         </div>
         <div className={styles.panel}>
@@ -125,7 +125,7 @@ export default () => {
               <li>Complete any task assigned by brand‘s campaigns.</li>
               <li>Invite friends to do the same using your referral link.</li>
               <li>
-                <span>Earn rewards and commissions</span>once they complete tasks.
+                <span>Earn rewards and commissions</span> once they complete tasks.
               </li>
             </ul>
             <img
@@ -155,6 +155,7 @@ export default () => {
         </div>
       </section>
       <section className={styles.partners}>
+        <h2>Trusted by brands & communities</h2>
         <img style={{ width: '75vw' }} src="https://db35z3hw6fbxp.cloudfront.net/Group+850.png" />
       </section>
       <section className={styles.desc}>
@@ -170,29 +171,31 @@ export default () => {
           <h2 className={styles.title}>Start your AD3 Journey</h2>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+847.png" />
-            Explore <a href="https://ad3s-organization.gitbook.io/ad3-whitepaper/">Whitepaper</a> or
+            Explore <a href="https://ad3s-organization.gitbook.io/ad3-whitepaper/">Whitepaper</a>
           </p>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+796-1.png" />
-            join our <a href="https://twitter.com/ad3_protocol">community</a>
+            Join our <a href="https://twitter.com/ad3_protocol">community</a>
           </p>
           <p>
             <img src="https://db35z3hw6fbxp.cloudfront.net/Group+797.png" />
-            You can also
-            <a href="https://t.me/+oD5ACHb-e7tiMDdl">contact us</a>
-            to
+            <a style={{ marginLeft: 0 }} href="https://t.me/+oD5ACHb-e7tiMDdl">
+              contact us
+            </a>
+            to become a Partner
           </p>
-          <p style={{ paddingLeft: '8.6vw' }}>become our Partner</p>
-          <img
-            style={{
-              width: '72vw',
-              height: 'auto',
-              marginTop: '8vw',
-              marginBottom: '6vw',
-              marginLeft: '-4vw'
-            }}
-            src="https://db35z3hw6fbxp.cloudfront.net/Group+837.png"
-          />
+          <a href="https://forms.gle/3QbvvQfnKfpWqVrJ7">
+            <img
+              style={{
+                width: '72vw',
+                height: 'auto',
+                marginTop: '8vw',
+                marginBottom: '6vw',
+                marginLeft: '-4vw'
+              }}
+              src="https://db35z3hw6fbxp.cloudfront.net/Group+837.png"
+            />
+          </a>
         </div>
       </section>
       <section className={styles.bottom}>
@@ -226,7 +229,11 @@ export default () => {
           </a>
         </div>
         <div className={styles.line} />
-        <a className={styles.launch}>
+        <a
+          className={styles.launch}
+          href="https://forms.gle/3QbvvQfnKfpWqVrJ7"
+          onClick={(e) => e.stopPropagation()}
+        >
           <img
             className={styles.launchBtn}
             src="https://db35z3hw6fbxp.cloudfront.net/M+Group+823.png"

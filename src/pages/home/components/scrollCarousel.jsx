@@ -78,8 +78,10 @@ export default () => {
             <div className={styles.info}>
               <p className={styles.title}>Specialize in developing</p>
               <p className={styles.title}>marketing tasks</p>
-              <p className={styles.sub}>Set marketing goals, on-chain goals and off-chain goals</p>
-              <p className={styles.sub}>Choose Task Model.</p>
+              <p className={styles.sub}>
+                Create a marketing campaign with different task templates
+              </p>
+              <p className={styles.sub}> quickly base on your marketing goals.</p>
             </div>
             <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+770.png" />
           </motion.div>
@@ -91,8 +93,9 @@ export default () => {
           >
             <div className={styles.info}>
               <p className={styles.title}>Social Media Networking</p>
-              <p className={styles.sub}>Brands can share tasks to owned</p>
-              <p className={styles.sub}>social media and AD3&apos;s user Network.</p>
+              <p className={styles.sub}>Unleash the true power of social media networks by</p>
+              <p className={styles.sub}>sharing tasks on your own social media profiles</p>
+              <p className={styles.sub}>and engaging users.</p>
             </div>
             <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+781.png" />
           </motion.div>
@@ -104,9 +107,8 @@ export default () => {
           >
             <div className={styles.info}>
               <p className={styles.title}>Seamless tracking Services </p>
-              <p className={styles.sub}>Event analysis, tracking marketing ROI.</p>
-              <p className={styles.sub}>User analysis, finding target users.</p>
-              <p className={styles.sub}>Brand analysis, finding co-branding brands.</p>
+              <p className={styles.sub}>Monitor task performance and get user insights</p>
+              <p className={styles.sub}>through data analysis center.</p>
             </div>
             <img className={styles.icon} src="https://db35z3hw6fbxp.cloudfront.net/Group+762.png" />
           </motion.div>
