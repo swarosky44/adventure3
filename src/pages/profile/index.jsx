@@ -9,7 +9,7 @@ import { ethers } from 'ethers'
 import dayjs from 'dayjs'
 import Observer from '@researchgate/react-intersection-observer'
 import CampaignAbi from '@/utils/Campaign.json'
-import { request, getCurrentGasPrice } from '@/utils/request'
+import { request } from '@/utils/request'
 import styles from './index.module.less'
 
 const Profile = () => {
@@ -59,11 +59,6 @@ const Profile = () => {
       const cpaFee = ethers.utils.parseUnits(cpaTaskFeeAmount.toString(), 6).toNumber()
 
       const contract = new ethers.Contract(campaignAddress, CampaignAbi, signer)
-      const feeData = await getCurrentGasPrice()
-      const gasParams = {
-        maxFeePerGas: feeData.maxFeePerGas,
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
-      }
 
       if (type === 'cpa') {
         // 分享任务奖励
@@ -73,7 +68,7 @@ const Profile = () => {
           v: cpaTaskFeeKeyV
         })
         if (signature !== '0') {
-          const claimCpaRewardTx = await contract.claimCpaReward(cpaFee, signature, gasParams)
+          const claimCpaRewardTx = await contract.claimCpaReward(cpaFee, signature)
           const claimCpaRewardTxResult = await claimCpaRewardTx.wait()
           if (`${claimCpaRewardTxResult.status}` === '1') {
             await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })
@@ -93,7 +88,7 @@ const Profile = () => {
           v: actionTaskFeeKeyV
         })
         if (signature !== '0') {
-          const claimTaskRewardTx = await contract.claimTaskReward(actionFee, signature, gasParams)
+          const claimTaskRewardTx = await contract.claimTaskReward(actionFee, signature)
           const claimTaskRewardTxResult = await claimTaskRewardTx.wait()
           if (`${claimTaskRewardTxResult.status}` === '1') {
             await updatePayFeeStatus({ address, projectTaskId, type, status: 'finish' })

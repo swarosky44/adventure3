@@ -8,7 +8,7 @@ export const ALCHEMY_POLYGON_AD3_PRIVATE_KEY = '5aSHl7b-uw8NS_voiPDrdHDp5s7LEJhF
 
 export const ALCHEMY_MUMBAI_AD3_PRIVATE_KEY = 'Ko5Mfq83UFafu5lEO_znMcqjoTgRaWJ7'
 
-export const PRO_API_PREFIX = 'https://www.adventure3.tk'
+export const PRO_API_PREFIX = 'https://ad3.app'
 
 export const API_PREFIX = location.origin
 

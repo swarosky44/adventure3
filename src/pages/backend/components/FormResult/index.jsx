@@ -24,7 +24,7 @@ const FormResult = ({ data = {}, setCurrent = () => {} }) => {
             content={
               <QRCode
                 errorLevel="H"
-                value={`https://www.adventure3.tk/detail?id=${id}`}
+                value={`https://ad3.app/detail?id=${id}`}
                 icon="https://db35z3hw6fbxp.cloudfront.net/Group+789.png"
               />
             }

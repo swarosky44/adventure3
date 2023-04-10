@@ -3,7 +3,7 @@ import 'braft-editor/dist/index.css'
 
 const QuillEditor = ({ value = '', onChange = () => {} }) => {
   const uploadFn = (param) => {
-    const serverURL = 'https://www.adventure3.tk/api/file/upload'
+    const serverURL = 'https://ad3.app/api/file/upload'
     const xhr = new XMLHttpRequest()
     const fd = new FormData()
 

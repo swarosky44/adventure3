@@ -22,7 +22,7 @@ import { useAccount, useSigner, useNetwork, useSwitchNetwork } from 'wagmi'
 import Observer from '@researchgate/react-intersection-observer'
 import dayjs from 'dayjs'
 import zhCN from 'antd/locale/zh_CN'
-import { request, getCurrentGasPrice } from '@/utils/request'
+import { request } from '@/utils/request'
 import QuillEditor from '../quillEditor'
 import TaskItemDrawer from '../TaskItemDrawer'
 import { TASK_TYPE, ENV, AD3HUB_ADDRESS, USDT_TOKEN_ADDRESS } from '@/utils/const'
@@ -171,11 +171,6 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
           6
         )
         .toNumber()
-      const feeData = await getCurrentGasPrice()
-      const gasParams = {
-        maxFeePerGas: feeData.maxFeePerGas,
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
-      }
 
       // 开始链上通信
       // 判断用户钱包余额
@@ -190,11 +185,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
       }
       // 申请额度
       setLoadingText('正在申请链上 TOKEN 的消费额度，请耐心等待，并尽快签名钱包内的申请')
-      const approveTx = await token.approve(
-        AD3HUB_ADDRESS,
-        (cpaBonusBudget + taskBonusBudget) * 10,
-        gasParams
-      )
+      const approveTx = await token.approve(AD3HUB_ADDRESS, (cpaBonusBudget + taskBonusBudget) * 10)
       const approveTxResult = await approveTx.wait()
       if (`${approveTxResult.status}` === '1') {
         // 创建链上活动合约
@@ -204,11 +195,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
           cpaBonusBudget,
           taskBonusBudget,
           tokenAddress,
-          tokenAddress,
-          {
-            maxFeePerGas: feeData.maxFeePerGas,
-            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
-          }
+          tokenAddress
         )
         const createCampaignTxResult = await createCampaignTx.wait()
 
@@ -370,7 +357,7 @@ const TaskForm = ({ setCurrent = () => {}, setTaskResult = () => {} }) => {
               <Upload.Dragger
                 name="file"
                 accept="image/*"
-                action="https://www.adventure3.tk/api/file/upload"
+                action="https://ad3.app/api/file/upload"
                 headers={{
                   authorization: 'authorization-text'
                 }}

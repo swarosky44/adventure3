@@ -155,7 +155,7 @@ const BasicForm = ({ setCurrent = () => {} }) => {
             <Upload
               name="file"
               accept="image/*"
-              action="https://www.adventure3.tk/api/file/upload"
+              action="https://ad3.app/api/file/upload"
               listType="picture-card"
               fileList={fileList}
               headers={{

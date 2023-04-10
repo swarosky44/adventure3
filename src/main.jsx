@@ -20,7 +20,7 @@ const CustomAvatar = ({ address, ensImage, size }) => {
         height: size,
         width: size
       }}
-      onClick={() => window.location.assign('https://www.adventure3.tk/profile')}
+      onClick={() => window.location.assign('https://ad3.app/profile')}
     >
       <img
         style={{ width: '100%' }}

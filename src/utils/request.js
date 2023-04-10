@@ -38,12 +38,15 @@ export const getCurrentGasPrice = async () => {
     const { data } = await axios({
       method: 'get',
       url:
-        ENV === 'test'
+        ENV === 'prod'
           ? 'https://gasstation-mainnet.matic.network/v2'
           : 'https://gasstation-mumbai.matic.today/v2'
     })
     maxFeePerGas = ethers.utils.parseUnits(String(Math.ceil(data.fast.maxFee)), 'gwei')
-    maxPriorityFeePerGas = ethers.utils.parseUnits(String(Math.ceil(data.fast.maxPriorityFee)), 'gwei')
+    maxPriorityFeePerGas = ethers.utils.parseUnits(
+      String(Math.ceil(data.fast.maxPriorityFee)),
+      'gwei'
+    )
   } catch {
     // ignore
   }

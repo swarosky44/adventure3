@@ -157,7 +157,7 @@ export default ({
                   <div className={styles.taskOperaPannel} id="detail-task-share-copy-button">
                     <div className={styles.taskBtns}>
                       <CopyToClipboard
-                        text={`https://www.adventure3.tk/detail?id=${projectTaskId}&shareId=${shareCode}`}
+                        text={`https://ad3.app/detail?id=${projectTaskId}&shareId=${shareCode}`}
                         onCopy={() => {
                           window.dataLayer.push({
                             event: 'lp-shareitem-copy-clk',

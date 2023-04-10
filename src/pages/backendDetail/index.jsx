@@ -191,8 +191,8 @@ export default () => {
           <Descriptions.Item label="活动页面">
             <a
               target="_blank"
-              href={`https://www.adventure3.tk/detail?id=${data.projectTaskId}`}
-            >{`https://www.adventure3.tk/detail?id=${data.projectTaskId}`}</a>
+              href={`https://ad3.app/detail?id=${data.projectTaskId}`}
+            >{`https://ad3.app/detail?id=${data.projectTaskId}`}</a>
           </Descriptions.Item>
           <Descriptions.Item label="活动合约">{data.campaignAddress}</Descriptions.Item>
           <Descriptions.Item label="合约余额">
