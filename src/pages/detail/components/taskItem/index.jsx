@@ -73,6 +73,7 @@ export default ({
       }, 1000)
       window.dataLayer.push({
         event: 'lp-taskitem-verify-success-clk',
+        address: address || '',
         projectId: projectTaskId || '',
         taskType: item.taskType || '',
         actionId: item.actionTaskId || ''
@@ -130,6 +131,7 @@ export default ({
                 onChange={() => {
                   window.dataLayer.push({
                     event: 'lp-taskitem-go-expose',
+                    address: address || '',
                     projectId: projectTaskId || '',
                     taskType: item.taskType || '',
                     actionId: item.actionTaskId || ''
@@ -141,6 +143,7 @@ export default ({
                   onClick={() => {
                     window.dataLayer.push({
                       event: 'lp-taskitem-go-clk',
+                      address: address || '',
                       projectId: projectTaskId || '',
                       taskType: item.taskType || '',
                       actionId: item.actionTaskId || ''
@@ -156,6 +159,7 @@ export default ({
                 onChange={() => {
                   window.dataLayer.push({
                     event: 'lp-taskitem-verify-expose',
+                    address: address || '',
                     projectId: projectTaskId || '',
                     taskType: item.taskType || '',
                     actionId: item.actionTaskId || ''
@@ -167,6 +171,7 @@ export default ({
                   onClick={() => {
                     window.dataLayer.push({
                       event: 'lp-taskitem-verify-clk',
+                      address: address || '',
                       projectId: projectTaskId || '',
                       taskType: item.taskType || '',
                       actionId: item.actionTaskId || ''
